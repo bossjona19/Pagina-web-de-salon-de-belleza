@@ -1,0 +1,53 @@
+// ============================================================
+// prisma/schema.prisma
+// ============================================================
+// Aquí definimos la estructura de la base de datos.
+// Prisma lee este archivo y crea/actualiza las tablas automáticamente.
+//
+// Para aplicar los cambios a la BD:
+//   npx prisma db push
+//
+// Para ver la BD visualmente en el browser:
+//   npx prisma studio
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"  // Cambia a "mysql" o "sqlite" si prefieres
+  url      = env("DATABASE_URL")  // La URL viene de .env.local
+}
+
+// ── Tabla de reservas ──────────────────────────────────────
+// Cada fila = una cita reservada por una clienta
+model Appointment {
+  id          Int      @id @default(autoincrement())  // ID único, automático
+  clientName  String   // Nombre de la clienta
+  phone       String   // Teléfono de contacto
+  service     String   // Nombre del servicio
+  date        String?  // Fecha (opcional)
+  time        String?  // Hora (opcional)
+  message     String?  // Mensaje adicional (opcional, el ? significa que puede estar vacío)
+  status      String   @default("pending")  // Estado: pending, confirmed, completed, cancelled
+  createdAt   DateTime @default(now())  // Se llena automáticamente al crear
+  updatedAt   DateTime @updatedAt       // Se actualiza automáticamente al modificar
+}
+
+// ── Tabla de mensajes de contacto ─────────────────────────
+model Contact {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String
+  service   String?
+  message   String?
+  createdAt DateTime @default(now())
+}
+
+// ── NOTA PARA TU HERMANO ──────────────────────────────────
+// Cuando quieras agregar un campo nuevo a la BD:
+// 1. Agrégalo aquí en el schema
+// 2. Corre: npx prisma db push
+// 3. Actualiza las APIs para incluir el campo nuevo
+// ¡Así de fácil! Prisma hace todo el trabajo de SQL por ti.
