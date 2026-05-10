@@ -1,246 +1,502 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Language" content="es, en, pt">
 <meta name="description" content="Eternal Beauty Studio — Maquillaje profesional, faciales y tratamientos de belleza en Panamá. Reserva tu cita hoy.">
-<title>Eternal Beauty Studio | Maquillaje & Tratamientos en Panamá</title>
+<title>Eternal Beauty Studio | Panamá</title>
+
+<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<!-- Lucide Icons (SVG icon library) -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<!-- Main styles (tu si.css mejorado) -->
 <link rel="stylesheet" href="si.css">
+
+<style>
+/* ── MEJORAS ADICIONALES SOBRE si.css ── */
+
+/* Lucide icons sizing helpers */
+.icon-sm  { width: 16px; height: 16px; }
+.icon-md  { width: 20px; height: 20px; }
+.icon-lg  { width: 24px; height: 24px; }
+.icon-xl  { width: 32px; height: 32px; }
+[data-lucide] { stroke-width: 1.5; }
+
+/* Nav admin link */
+.nav-admin-link {
+  display: none;                    /* shown via JS if logged in */
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--rose);
+  text-decoration: none;
+  padding: 6px 14px;
+  border: 0.5px solid var(--rose-light);
+  border-radius: 50px;
+  transition: var(--transition);
+}
+.nav-admin-link:hover { background: var(--rose); color: var(--white); }
+
+/* Contact items — icon refinement */
+.contact-item-icon svg { color: var(--rose); }
+
+/* Before/After caption */
+.ba-caption {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+
+/* Chatbot FAB */
+.chatbot-fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 58px;
+  height: 58px;
+  background: var(--rose);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(237,104,135,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 150;
+  transition: var(--transition);
+  animation: fab-pulse 2.5s ease-in-out infinite;
+}
+.chatbot-fab:hover {
+  background: var(--rose-dark);
+  transform: scale(1.08);
+  animation: none;
+}
+@keyframes fab-pulse {
+  0%,100% { box-shadow: 0 6px 24px rgba(237,104,135,0.4); }
+  50%      { box-shadow: 0 6px 36px rgba(237,104,135,0.65); }
+}
+.chatbot-fab svg { color: white; }
+
+/* Chatbot bubble popup */
+.chatbot-bubble {
+  position: fixed;
+  bottom: 100px;
+  right: 28px;
+  background: white;
+  border-radius: 16px 16px 4px 16px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--text-mid);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  max-width: 220px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s;
+  pointer-events: none;
+  z-index: 149;
+  line-height: 1.5;
+}
+.chatbot-bubble.show { opacity: 1; transform: translateY(0); }
+.chatbot-bubble strong { color: var(--rose); }
+
+/* Gallery scroll polish */
+.gallery-scroll { scrollbar-width: none; }
+.gallery-scroll::-webkit-scrollbar { display: none; }
+
+/* Responsive table helper */
+@media (max-width: 480px) {
+  .hero-title { font-size: 44px; }
+}
+
+/* Skip-to-content accessibility */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  background: var(--rose);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 0 0 8px 8px;
+  font-size: 12px;
+  z-index: 999;
+  transition: top 0.2s;
+  text-decoration: none;
+}
+.skip-link:focus { top: 0; }
+</style>
 </head>
 <body>
-<nav id="navbar">
-  <div class="nav-logo"><a class="so"href="#">Eternal<span>Beauty</span></div></a>
-  <ul class="nav-links">
+
+<!-- ACCESSIBILITY -->
+<a class="skip-link" href="#servicios">Saltar al contenido</a>
+
+<!-- ═══════════════════════════════════════
+     NAV
+════════════════════════════════════════ -->
+<nav id="navbar" role="navigation" aria-label="Navegación principal">
+  <a class="nav-logo" href="#" aria-label="Eternal Beauty Studio - Inicio">
+    Eternal<span>Beauty</span>
+  </a>
+
+  <ul class="nav-links" role="list">
     <li><a href="#about">Nosotros</a></li>
     <li><a href="#servicios">Servicios</a></li>
     <li><a href="#galeria">Galería</a></li>
     <li><a href="#contacto">Contacto</a></li>
+    <li>
+      <a href="admin.html" class="nav-admin-link" id="adminLink" aria-label="Panel de administración">
+        Admin
+      </a>
+    </li>
   </ul>
-  <button class="nav-cta" onclick="location.href='#contacto'">Reservar cita</button>
-  <button class="nav-hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menú">
+
+  <button class="nav-cta" onclick="location.href='#contacto'" aria-label="Reservar cita">
+    Reservar cita
+  </button>
+
+  <button class="nav-hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Abrir menú" aria-expanded="false">
     <span></span><span></span><span></span>
   </button>
 </nav>
 
 <!-- MOBILE NAV DRAWER -->
-<div class="mobile-nav" id="mobileNav">
-  <a href="#about" onclick="closeMobileNav()">Nosotros</a>
+<nav class="mobile-nav" id="mobileNav" aria-label="Menú móvil" aria-hidden="true">
+  <a href="#about"     onclick="closeMobileNav()">Nosotros</a>
   <a href="#servicios" onclick="closeMobileNav()">Servicios</a>
-  <a href="#galeria" onclick="closeMobileNav()">Galería</a>
-  <a href="#contacto" onclick="closeMobileNav()">Contacto</a>
-  <button class="nav-cta-mobile" onclick="closeMobileNav(); location.href='#contacto'">Reservar cita</button>
-</div>
+  <a href="#galeria"   onclick="closeMobileNav()">Galería</a>
+  <a href="#contacto"  onclick="closeMobileNav()">Contacto</a>
+  <button class="nav-cta-mobile" onclick="closeMobileNav(); location.href='#contacto'">
+    Reservar cita
+  </button>
+</nav>
 
-<!-- HERO -->
-<section id="hero">
-  <div class="hero-deco hero-deco-1"></div>
-  <div class="hero-deco hero-deco-2"></div>
-  <p class="hero-eyebrow">Estudio de Estética &amp; Spa</p>
-  <h1 class="hero-title">Realza tu<br><em>Belleza Natural</em></h1>
-  <p class="hero-subtitle">Tratamientos personalizados diseñados para resaltar tu esencia. Porque la verdadera belleza merece atención experta.</p>
+<!-- ═══════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<section id="hero" aria-labelledby="hero-title">
+  <div class="hero-deco hero-deco-1" aria-hidden="true"></div>
+  <div class="hero-deco hero-deco-2" aria-hidden="true"></div>
+
+  <p class="hero-eyebrow">Estudio de Estética &amp; Spa — Panamá</p>
+
+  <h1 class="hero-title" id="hero-title">
+    Realza tu<br><em>Belleza Natural</em>
+  </h1>
+
+  <p class="hero-subtitle">
+    Tratamientos personalizados diseñados para resaltar tu esencia.<br>
+    Porque la verdadera belleza merece atención experta.
+  </p>
+
   <div class="hero-buttons">
-    <button class="btn-primary" onclick="location.href='#servicios'">Ver servicios</button> 
-    <button class="btn-outline" onclick="location.href='#contacto'">Reservar cita</button>
+    <button class="btn-primary" onclick="location.href='#servicios'">
+      Ver servicios
+    </button>
+    <button class="btn-outline" onclick="location.href='#contacto'">
+      Reservar cita
+    </button>
   </div>
-  <div class="hero-stats">
-    <div class="stat">
-      <div class="stat-num">500+</div>
+
+  <div class="hero-stats" role="list" aria-label="Estadísticas del estudio">
+    <div class="stat" role="listitem">
+      <div class="stat-num" aria-label="500 clientes felices">500+</div>
       <div class="stat-label">Clientas felices</div>
     </div>
-    <div class="stat">
-      <div class="stat-num">8</div>
+    <div class="stat" role="listitem">
+      <div class="stat-num" aria-label="8 años de experiencia">8</div>
       <div class="stat-label">Años de experiencia</div>
     </div>
-    <div class="stat">
-      <div class="stat-num">100%</div>
+    <div class="stat" role="listitem">
+      <div class="stat-num" aria-label="100 por ciento productos premium">100%</div>
       <div class="stat-label">Productos premium</div>
     </div>
   </div>
 </section>
-<!-- ABOUT -->
-<section id="about">
+
+<!-- ═══════════════════════════════════════
+     ABOUT
+════════════════════════════════════════ -->
+<section id="about" aria-labelledby="about-title">
   <div class="about-grid">
-    <div class="about-visual">
+
+    <!-- Visual -->
+    <div class="about-visual" aria-hidden="true">
       <div class="about-img-main">
-        <img src="https://png.pngtree.com/png-vector/20240607/ourmid/pngtree-gold-gradient-womens-hair-salon-logo-design-png-image_12617839.png" alt="Foto del estudio">
+        <img
+          src="https://png.pngtree.com/png-vector/20240607/ourmid/pngtree-gold-gradient-womens-hair-salon-logo-design-png-image_12617839.png"
+          alt="Eternal Beauty Studio logo"
+          loading="lazy"
+        >
       </div>
       <div class="about-badge">
-        <div class="about-badge-num">★ 4.7 </div>
-        <div class="about-badge-text">Valoración</div>
+        <div class="about-badge-num">★ 4.7</div>
+        <div class="about-badge-text">Valoración clientes</div>
       </div>
     </div>
+
+    <!-- Content -->
     <div class="about-content">
       <p class="section-eyebrow fade-up">Sobre nosotros</p>
-      <h2 class="section-title fade-up fade-up-delay-1">Arte &amp; <em>cuidado</em><br>en cada detalle</h2>
-      <p class="section-sub fade-up fade-up-delay-2">Con más de 5 años de experiencia, combinamos técnicas avanzadas con un trato cercano y personalizado. Cada cita es una experiencia diseñada para que te sientas y luzcas extraordinaria.</p>
-      <div class="about-features fade-up fade-up-delay-3">
-        <div class="about-feature">
-          <div class="feature-dot"></div>
+      <h2 class="section-title fade-up fade-up-delay-1" id="about-title">
+        Arte &amp; <em>cuidado</em><br>en cada detalle
+      </h2>
+      <p class="section-sub fade-up fade-up-delay-2">
+        Con más de 8 años de experiencia, combinamos técnicas avanzadas con un trato cercano y personalizado.
+        Cada cita es una experiencia diseñada para que te sientas y luzcas extraordinaria.
+      </p>
+
+      <div class="about-features fade-up fade-up-delay-3" role="list">
+        <div class="about-feature" role="listitem">
+          <div class="feature-dot" aria-hidden="true"></div>
           <p class="feature-text">Técnicas certificadas internacionalmente y actualización constante</p>
         </div>
-        <div class="about-feature">
-          <div class="feature-dot"></div>
-          <p class="feature-text">Productos premium de alta gama, libres de parabenos</p>
+        <div class="about-feature" role="listitem">
+          <div class="feature-dot" aria-hidden="true"></div>
+          <p class="feature-text">Productos premium de alta gama, libres de parabenos y sulfatos</p>
         </div>
-        <div class="about-feature">
-          <div class="feature-dot"></div>
-          <p class="feature-text">Atención personalizada, con cita previa para garantizar tu tiempo</p>
+        <div class="about-feature" role="listitem">
+          <div class="feature-dot" aria-hidden="true"></div>
+          <p class="feature-text">Atención personalizada con cita previa para garantizar tu tiempo</p>
         </div>
       </div>
     </div>
+
   </div>
 </section>
 
-<!-- SERVICES -->
-<section id="servicios">
+<!-- ═══════════════════════════════════════
+     SERVICES
+════════════════════════════════════════ -->
+<section id="servicios" aria-labelledby="servicios-title">
   <div class="section-header centered">
     <p class="section-eyebrow fade-up">Lo que ofrezco</p>
-    <h2 class="section-title fade-up fade-up-delay-1">Servicios <em>exclusivos</em></h2>
-    <p class="section-sub fade-up fade-up-delay-2">Cada tratamiento es una experiencia cuidadosamente diseñada para ti.</p>
+    <h2 class="section-title fade-up fade-up-delay-1" id="servicios-title">
+      Servicios <em>exclusivos</em>
+    </h2>
+    <p class="section-sub fade-up fade-up-delay-2">
+      Cada tratamiento es una experiencia cuidadosamente diseñada para ti.
+    </p>
   </div>
-  <div class="filters fade-up" id="filters"></div>
-  <div class="services-grid" id="servicesGrid"></div>
+
+  <div class="filters fade-up" id="filters" role="group" aria-label="Filtrar servicios"></div>
+  <div class="services-grid" id="servicesGrid" role="list"></div>
 </section>
-<!-- GALLERY -->
-<section id="galeria">
+
+<!-- ═══════════════════════════════════════
+     GALLERY — BEFORE / AFTER
+════════════════════════════════════════ -->
+<section id="galeria" aria-labelledby="galeria-title">
   <div class="section-header">
     <p class="section-eyebrow fade-up">Portfolio</p>
-    <h2 class="section-title-gallery fade-up fade-up-delay-1">Mi <em>Trabajo</em></h2>
+    <h2 class="section-title-gallery fade-up fade-up-delay-1" id="galeria-title">
+      Mi <em>Trabajo</em>
+    </h2>
+    <p class="section-sub fade-up fade-up-delay-2" style="margin-bottom:0">
+      Desliza el control para ver la transformación.
+    </p>
   </div>
 
   <div class="ba-grid">
 
     <!-- SLIDER 1 -->
-    <div class="before-after" id="ba1">
-      <img src="img/1.jpeg" class="img-before" alt="Antes">
-      <div class="img-after-wrap" id="afterWrap1">
-        <img src="img/2.jpeg" class="img-after" alt="Después">
+    <div>
+      <div class="before-after" id="ba1" role="img" aria-label="Antes y después — transformación 1">
+        <img src="img/1.jpeg" class="img-before" alt="Antes del tratamiento">
+        <div class="img-after-wrap" id="afterWrap1">
+          <img src="img/2.jpeg" class="img-after" alt="Después del tratamiento">
+        </div>
+        <div class="ba-divider" id="baDivider1" aria-hidden="true"></div>
+        <div class="ba-handle" id="baHandle1" role="slider" aria-label="Desliza para comparar" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M7 4L2 10l5 6M13 4l5 6-5 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="ba-label ba-label-left" aria-hidden="true">Antes</span>
+        <span class="ba-label ba-label-right" aria-hidden="true">Después</span>
       </div>
-      <div class="ba-divider" id="baDivider1"></div>
-      <div class="ba-handle" id="baHandle1">
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-          <path d="M7 4L2 10l5 6M13 4l5 6-5 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <span class="ba-label ba-label-left">Antes</span>
-      <span class="ba-label ba-label-right">Después</span>
+      <p class="ba-caption">Tratamiento de keratina</p>
     </div>
 
     <!-- SLIDER 2 -->
-    <div class="before-after" id="ba2">
-      <img src="img/4.jpeg" class="img-before" alt="Antes">
-      <div class="img-after-wrap" id="afterWrap2">
-        <img src="img/3.jpeg" class="img-after" alt="Después">
+    <div>
+      <div class="before-after" id="ba2" role="img" aria-label="Antes y después — transformación 2">
+        <img src="img/4.jpeg" class="img-before" alt="Antes del tratamiento">
+        <div class="img-after-wrap" id="afterWrap2">
+          <img src="img/3.jpeg" class="img-after" alt="Después del tratamiento">
+        </div>
+        <div class="ba-divider" id="baDivider2" aria-hidden="true"></div>
+        <div class="ba-handle" id="baHandle2" role="slider" aria-label="Desliza para comparar" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M7 4L2 10l5 6M13 4l5 6-5 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="ba-label ba-label-left" aria-hidden="true">Antes</span>
+        <span class="ba-label ba-label-right" aria-hidden="true">Después</span>
       </div>
-      <div class="ba-divider" id="baDivider2"></div>
-      <div class="ba-handle" id="baHandle2">
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-          <path d="M7 4L2 10l5 6M13 4l5 6-5 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <span class="ba-label ba-label-left">Antes</span>
-      <span class="ba-label ba-label-right">Después</span>
+      <p class="ba-caption">Coloración &amp; tinte</p>
     </div>
 
   </div>
 </section>
-<!-- CONTACT -->
-<section id="contacto">
+
+<!-- ═══════════════════════════════════════
+     CONTACT
+════════════════════════════════════════ -->
+<section id="contacto" aria-labelledby="contacto-title">
   <div class="contact-grid">
+
+    <!-- Info column -->
     <div class="contact-info">
       <p class="section-eyebrow fade-up">Agenda tu cita</p>
-      <h2 class="section-title fade-up fade-up-delay-1">Hablemos <em>pronto</em></h2>
-      <p class="contact-tagline fade-up fade-up-delay-2">"Cada visita es el comienzo de una transformación que llevarás contigo."</p>
-      <div class="contact-items fade-up fade-up-delay-3">
-        <div class="contact-item">
-          <div class="contact-item-icon">📍</div>
+      <h2 class="section-title fade-up fade-up-delay-1" id="contacto-title">
+        Hablemos <em>pronto</em>
+      </h2>
+      <p class="contact-tagline fade-up fade-up-delay-2">
+        "Cada visita es el comienzo de una transformación que llevarás contigo."
+      </p>
+
+      <div class="contact-items fade-up fade-up-delay-3" role="list">
+
+        <div class="contact-item" role="listitem">
+          <div class="contact-item-icon" aria-hidden="true">
+            <i data-lucide="map-pin" class="icon-md"></i>
+          </div>
           <div class="contact-item-info">
             <h4>Ubicación</h4>
             <p>Panamá, República de Panamá</p>
           </div>
         </div>
-        <div class="contact-item">
-          <div class="contact-item-icon">🕐</div>
+
+        <div class="contact-item" role="listitem">
+          <div class="contact-item-icon" aria-hidden="true">
+            <i data-lucide="clock" class="icon-md"></i>
+          </div>
           <div class="contact-item-info">
             <h4>Horario</h4>
-            <p>Lunes a Sábado · 9:00am – 7:00pm</p>
+            <p>Lunes a Sábado · 9:00 am – 7:00 pm</p>
           </div>
         </div>
-        <div class="contact-item">
-          <div class="contact-item-icon">💬</div>
+
+        <div class="contact-item" role="listitem">
+          <div class="contact-item-icon" aria-hidden="true">
+            <i data-lucide="message-circle" class="icon-md"></i>
+          </div>
           <div class="contact-item-info">
             <h4>WhatsApp</h4>
-            <p>+507 6599 1047</p>
+            <p>+507 6599-1047</p>
           </div>
         </div>
+
+        <div class="contact-item" role="listitem">
+          <div class="contact-item-icon" aria-hidden="true">
+            <i data-lucide="instagram" class="icon-md"></i>
+          </div>
+          <div class="contact-item-info">
+            <h4>Instagram</h4>
+            <p>@eternalbeauty.pty</p>
+          </div>
+        </div>
+
       </div>
     </div>
-    <div class="contact-form fade-up fade-up-delay-2">
+
+    <!-- Form column -->
+    <div class="contact-form fade-up fade-up-delay-2" role="form" aria-label="Formulario de reserva">
       <h3 class="form-title">Reservar una cita</h3>
+
       <div class="form-row">
         <div class="form-group">
-          <label for="fname">Nombre</label>
-          <input type="text" id="fname" placeholder="Tu nombre">
-          <p class="form-error" id="fname-error">Por favor ingresa tu nombre</p>
+          <label for="fname">Nombre completo</label>
+          <input type="text" id="fname" placeholder="Tu nombre" autocomplete="name" required>
+          <p class="form-error" id="fname-error" role="alert">Por favor ingresa tu nombre</p>
         </div>
         <div class="form-group">
-          <label for="fphone">Teléfono</label>
-          <input type="tel" id="fphone" placeholder="+00 0000 0000">
-          <p class="form-error" id="fphone-error">Ingresa un teléfono válido</p>
+          <label for="fphone">Teléfono / WhatsApp</label>
+          <input type="tel" id="fphone" placeholder="+507 0000-0000" autocomplete="tel" required>
+          <p class="form-error" id="fphone-error" role="alert">Ingresa un teléfono válido</p>
         </div>
       </div>
+
       <div class="form-group">
-        <label for="fservice">Servicio</label>
-        <select id="fservice">
+        <label for="fservice">Servicio deseado</label>
+        <select id="fservice" required>
           <option value="">Selecciona un servicio</option>
         </select>
-        <p class="form-error" id="fservice-error">Selecciona un servicio</p>
+        <p class="form-error" id="fservice-error" role="alert">Selecciona un servicio</p>
       </div>
-      <div class="form-group">
-        <label for="fdate">Fecha preferida</label>
-        <input type="date" id="fdate">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fdate">Fecha preferida</label>
+          <input type="date" id="fdate">
+        </div>
+        <div class="form-group">
+          <label for="fhour">Hora</label>
+          <select id="fhour">
+            <option value="">Selecciona una hora</option>
+          </select>
+        </div>
       </div>
-      <div class="form-group">
-  <label for="fhour">Hora</label>
-  <select id="fhour">
-    <option value="">Selecciona una hora</option>
-  </select>
-</div>
+
       <div class="form-group">
         <label for="fmsg">Mensaje (opcional)</label>
-        <textarea id="fmsg" placeholder="Cuéntame qué necesitas..."></textarea>
+        <textarea id="fmsg" placeholder="Cuéntame qué necesitas…" rows="3"></textarea>
       </div>
+
       <div class="form-actions">
-        <button class="btn-submit" onclick="submitForm()">Enviar solicitud</button>
-        <button class="btn-wa" onclick="openWhatsApp()" title="Escribir por WhatsApp">💬</button>
+        <button class="btn-submit" onclick="submitForm()" aria-label="Enviar solicitud de reserva">
+          Enviar solicitud
+        </button>
+        <button class="btn-wa" onclick="openWhatsApp()" aria-label="Contactar por WhatsApp">
+          <i data-lucide="message-circle" class="icon-md"></i>
+        </button>
       </div>
-      <div class="success-msg" id="successMsg">
-      ¡Solicitud enviada! Te contactaré pronto para confirmar tu cita.
+
+      <div class="success-msg" id="successMsg" role="status" aria-live="polite">
+        ✅ ¡Solicitud enviada! Te contactaré pronto para confirmar tu cita.
       </div>
     </div>
+
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer>
+<!-- ═══════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer role="contentinfo">
   <div class="footer-logo">Eternal <span>Beauty</span></div>
-  <div class="footer-links">
-    <li><a href="#about">Nosotros</a></li>
-    <li><a href="#servicios">Servicios</a></li>
-    <li><a href="#galeria">Galería</a></li>
-    <li><a href="#contacto">Contacto</a></li>
-  </div>
-  <p class="footer-copy">© 2025 Eternal Beauty Studio</p>
+
+  <nav class="footer-links" aria-label="Links del pie de página">
+    <a href="#about">Nosotros</a>
+    <a href="#servicios">Servicios</a>
+    <a href="#galeria">Galería</a>
+    <a href="#contacto">Contacto</a>
+    <a href="login.html">Admin</a>
+  </nav>
+
+  <p class="footer-copy">© 2025 Eternal Beauty Studio · Panamá</p>
 </footer>
 
-<!-- SERVICE DETAIL OVERLAY -->
-<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+<!-- ═══════════════════════════════════════
+     SERVICE DETAIL OVERLAY
+════════════════════════════════════════ -->
+<div
+  class="detail-overlay"
+  id="detailOverlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="detailName"
+>
   <div class="detail-modal" id="detailModal">
     <div class="detail-visual">
-      <button class="detail-close" onclick="closeDetailDirect()">✕</button>
-      <img id="detailImg" class="detail-img">
+      <button class="detail-close" onclick="closeDetailDirect()" aria-label="Cerrar detalle">
+        <i data-lucide="x" class="icon-sm"></i>
+      </button>
+      <img id="detailImg" class="detail-img" alt="">
     </div>
     <div class="detail-content">
       <p class="detail-tag" id="detailTag"></p>
@@ -249,33 +505,67 @@
       <div class="detail-price-row">
         <div class="detail-price" id="detailPrice"></div>
         <div class="detail-actions">
-          <button class="btn-primary" onclick="reservarServicio()">Reservar</button>  
-          <button class="btn-whatsapp" onclick="openWhatsApp()">💬 WhatsApp</button>
+          <button class="btn-primary" onclick="reservarServicio()">Reservar</button>
+          <button class="btn-whatsapp" onclick="openWhatsApp()">
+            <i data-lucide="message-circle" class="icon-sm"></i>
+            WhatsApp
+          </button>
         </div>
       </div>
     </div>
   </div>
 </div>
-<script src="jv.js"></script>
-<script>
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'es',
-    includedLanguages: 'en,es,fr,it,pt',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-  }, 'google_translate_element');
-}
 
-function toggleTranslate() {
-  const box = document.getElementById("google_translate_element");
-  box.classList.toggle("show");
-}
-</script>
-
-<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-<div class="image-modal" id="imageModal" onclick="closeModal()">
-  <span class="close-btn">&times;</span>
-  <img id="modalImg">
+<!-- IMAGE MODAL -->
+<div class="image-modal" id="imageModal" onclick="closeModal()" role="dialog" aria-label="Imagen ampliada">
+  <span class="close-btn" aria-label="Cerrar">&times;</span>
+  <img id="modalImg" alt="Imagen ampliada">
 </div>
+
+<!-- ═══════════════════════════════════════
+     CHATBOT FAB (placeholder)
+════════════════════════════════════════ -->
+<button class="chatbot-fab" id="chatbotFab" aria-label="Abrir asistente virtual" onclick="toggleChatbot()">
+  <i data-lucide="bot" class="icon-lg"></i>
+</button>
+<div class="chatbot-bubble" id="chatbotBubble">
+  ¡Hola! 👋 Soy tu asistente.<br>
+  <strong>¿En qué puedo ayudarte hoy?</strong>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════ -->
+<script type="module" src="app.js"></script>
+
+<script>
+  // Init Lucide icons after DOM is ready
+  document.addEventListener("DOMContentLoaded", () => {
+    lucide.createIcons();
+  });
+
+  // Re-init after dynamic content (service cards)
+  const origRenderServices = window.renderServices;
+
+  // Chatbot FAB bubble
+  let bubbleTimer;
+  function toggleChatbot() {
+    const bubble = document.getElementById("chatbotBubble");
+    bubble.classList.toggle("show");
+    // Auto-hide after 4s
+    clearTimeout(bubbleTimer);
+    if (bubble.classList.contains("show")) {
+      bubbleTimer = setTimeout(() => bubble.classList.remove("show"), 4000);
+    }
+    // TODO: conectar a chatbot real aquí
+  }
+
+  // Show bubble on first load (after 3 seconds)
+  setTimeout(() => {
+    const b = document.getElementById("chatbotBubble");
+    b.classList.add("show");
+    bubbleTimer = setTimeout(() => b.classList.remove("show"), 5000);
+  }, 3000);
+</script>
 </body>
 </html>
