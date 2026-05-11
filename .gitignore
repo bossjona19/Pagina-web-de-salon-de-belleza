@@ -1,2 +1,3 @@
-package-lock.json
-firebase-config.js
+package-lock
+firebase-config
+node_modules
