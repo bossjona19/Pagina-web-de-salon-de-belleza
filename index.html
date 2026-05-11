@@ -35,11 +35,427 @@
     <li><a href="#contacto">Contacto</a></li>
   </ul>
 
-  <button class="nav-cta" onclick="location.href='login.html'" aria-label="Reservar cita">
-    Inicio Session
-  </button>
+  <button class="nav-cta" onclick="openLoginModal()" aria-label="Iniciar sesión">
+      Iniciar Sesión
+    </button>
 </nav>
+<!-- ============================================================
+  PARCHE: Agrega esto al final de tu index.html, justo antes de </body>
+  También reemplaza el botón del navbar por el que se muestra abajo
+  ============================================================ -->
 
+<!-- PASO 1: Reemplaza este botón en tu navbar (línea ~18 del index.html):
+  ANTES:
+    <button class="nav-cta" onclick="location.href='login.html'" aria-label="Reservar cita">
+      Inicio Session
+    </button>
+
+  DESPUÉS:
+    <button class="nav-cta" onclick="openLoginModal()" aria-label="Iniciar sesión">
+      Iniciar Sesión
+    </button>
+-->
+
+<!-- PASO 2: Agrega este bloque completo antes del </body> en index.html -->
+
+<!-- ═══════════════════════════ LOGIN MODAL ════════════════════════════ -->
+<div class="lm-backdrop" id="loginBackdrop" onclick="handleBackdropClick(event)">
+  <div class="lm-modal" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="lmTitle">
+
+    <!-- Close -->
+    <button class="lm-close" onclick="closeLoginModal()" aria-label="Cerrar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+
+    <!-- Brand -->
+    <div class="lm-brand">
+      <div class="lm-logo">Eternal<em>Beauty</em></div>
+      <p class="lm-tagline">Acceso exclusivo para administradoras</p>
+    </div>
+
+    <!-- Error -->
+    <div class="lm-error" id="lmError"></div>
+
+    <!-- Google Button -->
+    <button class="lm-btn-google" id="lmGoogleBtn" onclick="doGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      Continuar con Google
+    </button>
+
+    <div class="lm-divider"><span>o con correo y contraseña</span></div>
+
+    <!-- Email -->
+    <div class="lm-field">
+      <label for="lmEmail">Correo electrónico</label>
+      <input type="email" id="lmEmail" placeholder="Felipe.peña@gmail.com" autocomplete="email">
+    </div>
+
+    <!-- Password -->
+    <div class="lm-field">
+      <label for="lmPassword">Contraseña</label>
+      <div class="lm-input-wrap">
+        <input type="password" id="lmPassword" placeholder="••••••••" autocomplete="current-password">
+        <button class="lm-eye" type="button" onclick="togglePass()" aria-label="Mostrar contraseña">
+          <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button class="lm-btn-submit" id="lmSubmitBtn" onclick="doEmailLogin()">
+      <span class="lm-btn-text">Ingresar al panel</span>
+      <div class="lm-spinner"></div>
+    </button>
+
+    <p class="lm-note">Solo cuentas autorizadas pueden acceder al panel admin.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ MODAL STYLES ════════════════════════════ -->
+<style>
+/* Backdrop */
+.lm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(42, 34, 32, 0.68);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.lm-backdrop.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Modal box */
+.lm-modal {
+  background: #fffaf7;
+  border-radius: 20px;
+  padding: 40px 36px 32px;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.5);
+  transform: translateY(24px) scale(0.97);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.lm-backdrop.open .lm-modal {
+  transform: translateY(0) scale(1);
+}
+
+/* Close button */
+.lm-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 32px; height: 32px;
+  border: none;
+  background: #f0e8e0;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: #a08070;
+  transition: all 0.2s;
+}
+.lm-close:hover { background: #ed6887; color: white; }
+
+/* Brand */
+.lm-brand { text-align: center; margin-bottom: 28px; }
+.lm-logo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  color: #3a3333;
+}
+.lm-logo em { color: #ed6887; font-style: italic; }
+.lm-tagline {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #b09080;
+  margin-top: 4px;
+}
+
+/* Error */
+.lm-error {
+  background: rgba(237,104,135,0.08);
+  border: 1px solid rgba(237,104,135,0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #da3b5d;
+  margin-bottom: 16px;
+  display: none;
+  line-height: 1.5;
+}
+.lm-error.show { display: block; }
+
+/* Google btn */
+.lm-btn-google {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 12px 16px;
+  background: white;
+  border: 1.5px solid #dadce0;
+  border-radius: 10px;
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #3c4043;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 16px;
+}
+.lm-btn-google:hover { background: #f8f9fa; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.lm-btn-google:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Divider */
+.lm-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 0 0 18px;
+  color: #c0b0a8;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.lm-divider::before, .lm-divider::after {
+  content: ''; flex: 1; height: 1px; background: #e8e0d8;
+}
+
+/* Fields */
+.lm-field { margin-bottom: 14px; }
+.lm-field label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #a09080;
+  margin-bottom: 6px;
+}
+.lm-field input {
+  width: 100%;
+  background: white;
+  border: 1.5px solid #e8e0d8;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  color: #3a3333;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.lm-field input:focus {
+  border-color: #ed6887;
+  box-shadow: 0 0 0 3px rgba(237,104,135,0.1);
+}
+.lm-input-wrap { position: relative; }
+.lm-input-wrap input { padding-right: 40px; }
+.lm-eye {
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: #b09080; padding: 2px;
+  display: flex; align-items: center;
+}
+.lm-eye:hover { color: #ed6887; }
+
+/* Submit */
+.lm-btn-submit {
+  width: 100%;
+  background: #ed6887;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s;
+  margin-top: 6px;
+  position: relative;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.lm-btn-submit:hover { background: #da3b5d; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(218,59,93,0.28); }
+.lm-btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.lm-spinner {
+  display: none;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: lmSpin 0.7s linear infinite;
+}
+.lm-btn-submit.loading .lm-btn-text { opacity: 0.5; }
+.lm-btn-submit.loading .lm-spinner { display: block; }
+@keyframes lmSpin { to { transform: rotate(360deg); } }
+
+.lm-note {
+  text-align: center;
+  font-size: 11px;
+  color: #c0b0a8;
+  margin-top: 14px;
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .lm-modal { padding: 32px 24px 28px; }
+}
+</style>
+
+<!-- ═══════════════════════════ MODAL SCRIPT ════════════════════════════ -->
+<script type="module">
+import { auth } from './firebase-config.js';
+import {
+  GoogleAuthProvider, signInWithPopup,
+  signInWithEmailAndPassword, onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+// ── Correo admin autorizado ──────────────────────────────────
+// ⚠️ CAMBIA ESTO por el correo real del admin
+const ADMIN_EMAIL = 'admin@eternalbeauty.com';
+
+// ── Modal open/close ─────────────────────────────────────────
+window.openLoginModal = () => {
+  document.getElementById('loginBackdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('lmEmail')?.focus(), 350);
+};
+window.closeLoginModal = () => {
+  document.getElementById('loginBackdrop').classList.remove('open');
+  document.body.style.overflow = '';
+  clearError();
+};
+window.handleBackdropClick = (e) => {
+  if (e.target.id === 'loginBackdrop') closeLoginModal();
+};
+
+// ESC key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLoginModal();
+});
+
+// Enter key en password
+document.getElementById('lmPassword')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doEmailLogin();
+});
+
+// Toggle password visibility
+window.togglePass = () => {
+  const inp = document.getElementById('lmPassword');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+};
+
+function showError(msg) {
+  const el = document.getElementById('lmError');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function clearError() {
+  document.getElementById('lmError').classList.remove('show');
+}
+
+function setLoading(btn, on) {
+  btn.disabled = on;
+  btn.classList.toggle('loading', on);
+}
+
+function redirectAdmin() {
+  window.location.href = 'admin.html';
+}
+
+// ── Validación de admin ───────────────────────────────────────
+function isAdmin(email) {
+  return email === ADMIN_EMAIL;
+}
+
+// ── Si ya está logueado como admin, mostrar link ──────────────
+onAuthStateChanged(auth, user => {
+  const adminLink = document.getElementById('adminLink');
+  if (user && isAdmin(user.email)) {
+    if (adminLink) adminLink.style.display = 'inline-block';
+    // Si intenta abrir el modal y ya está logueado, redirigir directo
+  } else {
+    if (adminLink) adminLink.style.display = 'none';
+  }
+});
+
+// ── Google Login ──────────────────────────────────────────────
+window.doGoogleLogin = async () => {
+  clearError();
+  const btn = document.getElementById('lmGoogleBtn');
+  btn.disabled = true;
+  btn.textContent = 'Conectando…';
+  try {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    if (!isAdmin(result.user.email)) {
+      await auth.signOut();
+      showError(`Esta cuenta (${result.user.email}) no tiene acceso al panel admin.`);
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Continuar con Google`;
+      return;
+    }
+    redirectAdmin();
+  } catch (err) {
+    showError('No se pudo iniciar sesión con Google. Intenta de nuevo.');
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Continuar con Google`;
+  }
+};
+
+// ── Email/Password Login ──────────────────────────────────────
+window.doEmailLogin = async () => {
+  clearError();
+  const email    = document.getElementById('lmEmail').value.trim();
+  const password = document.getElementById('lmPassword').value;
+  const btn      = document.getElementById('lmSubmitBtn');
+
+  if (!email || !password) {
+    showError('Por favor ingresa correo y contraseña.');
+    return;
+  }
+  if (!isAdmin(email)) {
+    showError('Este correo no tiene permisos de administrador.');
+    return;
+  }
+
+  setLoading(btn, true);
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    redirectAdmin();
+  } catch (err) {
+    const msgs = {
+      'auth/user-not-found':     'Usuario no encontrado.',
+      'auth/wrong-password':     'Contraseña incorrecta.',
+      'auth/invalid-email':      'Correo no válido.',
+      'auth/too-many-requests':  'Demasiados intentos. Espera un momento.',
+      'auth/invalid-credential': 'Correo o contraseña incorrectos.'
+    };
+    showError(msgs[err.code] || 'Error al iniciar sesión. Intenta de nuevo.');
+  } finally {
+    setLoading(btn, false);
+  }
+};
+</script>
 <!-- ═══════════════════════════════════════
      HERO
 ════════════════════════════════════════ -->
