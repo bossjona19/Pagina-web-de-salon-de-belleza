@@ -191,37 +191,69 @@ document.getElementById("fdate")?.addEventListener("change", generarHoras);
 generarHoras();
 
 // ─── FORM SUBMIT → FIRESTORE + WHATSAPP ──────────────────────
-window.submitForm = async function () {
-  const name    = document.getElementById("fname")?.value.trim()    || "";
-  const phone   = document.getElementById("fphone")?.value.trim()   || "";
-  const service = document.getElementById("fservice")?.value        || "";
-  const date    = document.getElementById("fdate")?.value           || "";
-  const hour    = document.getElementById("fhour")?.value           || "";
-  const msg     = document.getElementById("fmsg")?.value.trim()     || "";
+async function submitForm() {
 
-  // Validation
-  document.querySelectorAll(".form-error").forEach(e => e.classList.remove("show"));
+  const btn = document.getElementById("submitBtn");
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Enviando...";
+  }
+
+  const name    = document.getElementById("fname")?.value.trim() || "";
+  const phone   = document.getElementById("fphone")?.value.trim() || "";
+  const service = document.getElementById("fservice")?.value || "";
+  const date    = document.getElementById("fdate")?.value || "";
+  const hour    = document.getElementById("fhour")?.value || "";
+  const msg     = document.getElementById("fmsg")?.value.trim() || "";
+
+  document.querySelectorAll(".form-error").forEach(e => {
+    e.classList.remove("show");
+  });
+
   let valid = true;
-  if (!name)               { document.getElementById("fname-error").classList.add("show");    valid = false; }
-  if (!phone || phone.length < 6) { document.getElementById("fphone-error").classList.add("show");   valid = false; }
-  if (!service)            { document.getElementById("fservice-error").classList.add("show"); valid = false; }
-  if (!valid) return;
 
-  // Save to Firestore
+  if (!name) {
+    document.getElementById("fname-error").classList.add("show");
+    valid = false;
+  }
+
+  if (!phone || phone.length < 6) {
+    document.getElementById("fphone-error").classList.add("show");
+    valid = false;
+  }
+
+  if (!service) {
+    document.getElementById("fservice-error").classList.add("show");
+    valid = false;
+  }
+
+  if (!valid) {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Enviar solicitud";
+    }
+    return;
+  }
+
   try {
+
     await addDoc(collection(db, "reservas"), {
-      nombre: name, telefono: phone, servicio: service,
-      fecha: date, hora: hour, mensaje: msg,
+      nombre: name,
+      telefono: phone,
+      servicio: service,
+      fecha: date,
+      hora: hour,
+      mensaje: msg,
       estado: "pendiente",
       creadoEn: Timestamp.now()
     });
+
   } catch (err) {
-    console.warn("Firestore no conectado — solo WhatsApp:", err.message);
+    console.log("Firestore:", err.message);
   }
 
-  // Open WhatsApp
-  const waMsg =
-`Hola, quiero reservar una cita:
+  const waMsg = `Hola, quiero reservar una cita:
 
 👤 Nombre: ${name}
 📱 Teléfono: ${phone}
@@ -230,20 +262,53 @@ window.submitForm = async function () {
 🕐 Hora: ${hour || "No especificada"}
 💬 Mensaje: ${msg || "Ninguno"}`;
 
-  window.open(`https://wa.me/50765991047?text=${encodeURIComponent(waMsg)}`, "_blank");
+  const waURL = `https://wa.me/50765991047?text=${encodeURIComponent(waMsg)}`;
 
-  // Reset
-  ["fname","fphone","fdate","fhour","fmsg"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = "";
-  });
+  window.open(waURL, "_blank");
+
+  document.getElementById("fname").value = "";
+  document.getElementById("fphone").value = "";
   document.getElementById("fservice").value = "";
+  document.getElementById("fdate").value = "";
+  document.getElementById("fhour").value = "";
+  document.getElementById("fmsg").value = "";
+
   generarHoras();
 
   const ok = document.getElementById("successMsg");
-  if (ok) { ok.classList.add("show"); setTimeout(() => ok.classList.remove("show"), 5000); }
-};
 
+  if (ok) {
+    ok.classList.add("show");
+
+    setTimeout(() => {
+      ok.classList.remove("show");
+    }, 5000);
+  }
+
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = "Enviar solicitud";
+  }
+}
+
+window.submitForm = submitForm;
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  renderFilters();
+  renderServices();
+  initScrollAnimations();
+
+  initSlider("ba1", "afterWrap1", "baDivider1", "baHandle1");
+  initSlider("ba2", "afterWrap2", "baDivider2", "baHandle2");
+
+  const submitBtn = document.getElementById("submitBtn");
+
+  if (submitBtn) {
+    submitBtn.addEventListener("click", submitForm);
+  }
+
+});
 // ─── SCROLL ANIMATIONS ───────────────────────────────────────
 function initScrollAnimations() {
   const io = new IntersectionObserver(entries => {
@@ -297,9 +362,9 @@ function initSlider(containerId, afterWrapId, dividerId, handleId) {
     const rect = container.getBoundingClientRect();
     afterWrap.querySelector("img").style.width = rect.width + "px";
     const pct = Math.max(0, Math.min((clientX - rect.left) / rect.width, 1)) * 100;
-    afterWrap.style.width = pct + "%";
-    divider.style.left    = pct + "%";
-    handle.style.left     = pct + "%";
+    afterWrap.style.width = `${pct}%`;
+    divider.style.left = `${pct}%`;
+    handle.style.left = `calc(${pct}% - 0px)`;
   }
 
   handle.addEventListener("mousedown",  e => { e.preventDefault(); dragging = true; container.classList.add("dragging"); });

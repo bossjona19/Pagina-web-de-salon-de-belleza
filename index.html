@@ -8,126 +8,12 @@
 
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<!-- Lucide Icons (SVG icon library) -->
+
+<!-- Lucide Icons -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
-<!-- Main styles (tu si.css mejorado) -->
-<link rel="stylesheet" href="si.css">
-
-<style>
-/* ── MEJORAS ADICIONALES SOBRE si.css ── */
-
-/* Lucide icons sizing helpers */
-.icon-sm  { width: 16px; height: 16px; }
-.icon-md  { width: 20px; height: 20px; }
-.icon-lg  { width: 24px; height: 24px; }
-.icon-xl  { width: 32px; height: 32px; }
-[data-lucide] { stroke-width: 1.5; }
-
-/* Nav admin link */
-.nav-admin-link {
-  display: none;                    /* shown via JS if logged in */
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--rose);
-  text-decoration: none;
-  padding: 6px 14px;
-  border: 0.5px solid var(--rose-light);
-  border-radius: 50px;
-  transition: var(--transition);
-}
-.nav-admin-link:hover { background: var(--rose); color: var(--white); }
-
-/* Contact items — icon refinement */
-.contact-item-icon svg { color: var(--rose); }
-
-/* Before/After caption */
-.ba-caption {
-  text-align: center;
-  margin-top: 12px;
-  font-size: 12px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-light);
-}
-
-/* Chatbot FAB */
-.chatbot-fab {
-  position: fixed;
-  bottom: 28px;
-  right: 28px;
-  width: 58px;
-  height: 58px;
-  background: var(--rose);
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 6px 24px rgba(237,104,135,0.4);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 150;
-  transition: var(--transition);
-  animation: fab-pulse 2.5s ease-in-out infinite;
-}
-.chatbot-fab:hover {
-  background: var(--rose-dark);
-  transform: scale(1.08);
-  animation: none;
-}
-@keyframes fab-pulse {
-  0%,100% { box-shadow: 0 6px 24px rgba(237,104,135,0.4); }
-  50%      { box-shadow: 0 6px 36px rgba(237,104,135,0.65); }
-}
-.chatbot-fab svg { color: white; }
-
-/* Chatbot bubble popup */
-.chatbot-bubble {
-  position: fixed;
-  bottom: 100px;
-  right: 28px;
-  background: white;
-  border-radius: 16px 16px 4px 16px;
-  padding: 14px 18px;
-  font-size: 13px;
-  color: var(--text-mid);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-  max-width: 220px;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.3s;
-  pointer-events: none;
-  z-index: 149;
-  line-height: 1.5;
-}
-.chatbot-bubble.show { opacity: 1; transform: translateY(0); }
-.chatbot-bubble strong { color: var(--rose); }
-
-/* Gallery scroll polish */
-.gallery-scroll { scrollbar-width: none; }
-.gallery-scroll::-webkit-scrollbar { display: none; }
-
-/* Responsive table helper */
-@media (max-width: 480px) {
-  .hero-title { font-size: 44px; }
-}
-
-/* Skip-to-content accessibility */
-.skip-link {
-  position: absolute;
-  top: -100px;
-  left: 16px;
-  background: var(--rose);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 0 0 8px 8px;
-  font-size: 12px;
-  z-index: 999;
-  transition: top 0.2s;
-  text-decoration: none;
-}
-.skip-link:focus { top: 0; }
-</style>
+<!-- Estilos unificados -->
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -135,7 +21,7 @@
 <a class="skip-link" href="#servicios">Saltar al contenido</a>
 
 <!-- ═══════════════════════════════════════
-     NAV
+     NAV (estilo Lumière — limpio)
 ════════════════════════════════════════ -->
 <nav id="navbar" role="navigation" aria-label="Navegación principal">
   <a class="nav-logo" href="#" aria-label="Eternal Beauty Studio - Inicio">
@@ -147,29 +33,9 @@
     <li><a href="#servicios">Servicios</a></li>
     <li><a href="#galeria">Galería</a></li>
     <li><a href="#contacto">Contacto</a></li>
-    <li>
-      <a href="admin.html" class="nav-admin-link" id="adminLink" aria-label="Panel de administración">
-        Admin
-      </a>
-    </li>
   </ul>
 
   <button class="nav-cta" onclick="location.href='#contacto'" aria-label="Reservar cita">
-    Reservar cita
-  </button>
-
-  <button class="nav-hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Abrir menú" aria-expanded="false">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
-
-<!-- MOBILE NAV DRAWER -->
-<nav class="mobile-nav" id="mobileNav" aria-label="Menú móvil" aria-hidden="true">
-  <a href="#about"     onclick="closeMobileNav()">Nosotros</a>
-  <a href="#servicios" onclick="closeMobileNav()">Servicios</a>
-  <a href="#galeria"   onclick="closeMobileNav()">Galería</a>
-  <a href="#contacto"  onclick="closeMobileNav()">Contacto</a>
-  <button class="nav-cta-mobile" onclick="closeMobileNav(); location.href='#contacto'">
     Reservar cita
   </button>
 </nav>
@@ -178,20 +44,14 @@
      HERO
 ════════════════════════════════════════ -->
 <section id="hero" aria-labelledby="hero-title">
-  <div class="hero-deco hero-deco-1" aria-hidden="true"></div>
-  <div class="hero-deco hero-deco-2" aria-hidden="true"></div>
-
   <p class="hero-eyebrow">Estudio de Estética &amp; Spa — Panamá</p>
-
   <h1 class="hero-title" id="hero-title">
     Realza tu<br><em>Belleza Natural</em>
   </h1>
-
   <p class="hero-subtitle">
     Tratamientos personalizados diseñados para resaltar tu esencia.<br>
     Porque la verdadera belleza merece atención experta.
   </p>
-
   <div class="hero-buttons">
     <button class="btn-primary" onclick="location.href='#servicios'">
       Ver servicios
@@ -203,15 +63,15 @@
 
   <div class="hero-stats" role="list" aria-label="Estadísticas del estudio">
     <div class="stat" role="listitem">
-      <div class="stat-num" aria-label="500 clientes felices">500+</div>
+      <div class="stat-num">500+</div>
       <div class="stat-label">Clientas felices</div>
     </div>
     <div class="stat" role="listitem">
-      <div class="stat-num" aria-label="8 años de experiencia">8</div>
+      <div class="stat-num">15</div>
       <div class="stat-label">Años de experiencia</div>
     </div>
     <div class="stat" role="listitem">
-      <div class="stat-num" aria-label="100 por ciento productos premium">100%</div>
+      <div class="stat-num">100%</div>
       <div class="stat-label">Productos premium</div>
     </div>
   </div>
@@ -223,7 +83,6 @@
 <section id="about" aria-labelledby="about-title">
   <div class="about-grid">
 
-    <!-- Visual -->
     <div class="about-visual" aria-hidden="true">
       <div class="about-img-main">
         <img
@@ -238,7 +97,6 @@
       </div>
     </div>
 
-    <!-- Content -->
     <div class="about-content">
       <p class="section-eyebrow fade-up">Sobre nosotros</p>
       <h2 class="section-title fade-up fade-up-delay-1" id="about-title">
@@ -291,18 +149,13 @@
 ════════════════════════════════════════ -->
 <section id="galeria" aria-labelledby="galeria-title">
   <div class="section-header">
-    <p class="section-eyebrow fade-up">Portfolio</p>
     <h2 class="section-title-gallery fade-up fade-up-delay-1" id="galeria-title">
       Mi <em>Trabajo</em>
     </h2>
-    <p class="section-sub fade-up fade-up-delay-2" style="margin-bottom:0">
-      Desliza el control para ver la transformación.
-    </p>
   </div>
 
   <div class="ba-grid">
 
-    <!-- SLIDER 1 -->
     <div>
       <div class="before-after" id="ba1" role="img" aria-label="Antes y después — transformación 1">
         <img src="img/1.jpeg" class="img-before" alt="Antes del tratamiento">
@@ -318,10 +171,8 @@
         <span class="ba-label ba-label-left" aria-hidden="true">Antes</span>
         <span class="ba-label ba-label-right" aria-hidden="true">Después</span>
       </div>
-      <p class="ba-caption">Tratamiento de keratina</p>
     </div>
 
-    <!-- SLIDER 2 -->
     <div>
       <div class="before-after" id="ba2" role="img" aria-label="Antes y después — transformación 2">
         <img src="img/4.jpeg" class="img-before" alt="Antes del tratamiento">
@@ -337,7 +188,6 @@
         <span class="ba-label ba-label-left" aria-hidden="true">Antes</span>
         <span class="ba-label ba-label-right" aria-hidden="true">Después</span>
       </div>
-      <p class="ba-caption">Coloración &amp; tinte</p>
     </div>
 
   </div>
@@ -349,7 +199,6 @@
 <section id="contacto" aria-labelledby="contacto-title">
   <div class="contact-grid">
 
-    <!-- Info column -->
     <div class="contact-info">
       <p class="section-eyebrow fade-up">Agenda tu cita</p>
       <h2 class="section-title fade-up fade-up-delay-1" id="contacto-title">
@@ -404,7 +253,6 @@
       </div>
     </div>
 
-    <!-- Form column -->
     <div class="contact-form fade-up fade-up-delay-2" role="form" aria-label="Formulario de reserva">
       <h3 class="form-title">Reservar una cita</h3>
 
@@ -481,16 +329,8 @@
   <p class="footer-copy">© 2025 Eternal Beauty Studio · Panamá</p>
 </footer>
 
-<!-- ═══════════════════════════════════════
-     SERVICE DETAIL OVERLAY
-════════════════════════════════════════ -->
-<div
-  class="detail-overlay"
-  id="detailOverlay"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="detailName"
->
+<!-- SERVICE DETAIL OVERLAY -->
+<div class="detail-overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-labelledby="detailName">
   <div class="detail-modal" id="detailModal">
     <div class="detail-visual">
       <button class="detail-close" onclick="closeDetailDirect()" aria-label="Cerrar detalle">
@@ -522,9 +362,7 @@
   <img id="modalImg" alt="Imagen ampliada">
 </div>
 
-<!-- ═══════════════════════════════════════
-     CHATBOT FAB (placeholder)
-════════════════════════════════════════ -->
+<!-- CHATBOT FAB -->
 <button class="chatbot-fab" id="chatbotFab" aria-label="Abrir asistente virtual" onclick="toggleChatbot()">
   <i data-lucide="bot" class="icon-lg"></i>
 </button>
@@ -533,34 +371,22 @@
   <strong>¿En qué puedo ayudarte hoy?</strong>
 </div>
 
-<!-- ═══════════════════════════════════════
-     SCRIPTS
-════════════════════════════════════════ -->
+<!-- SCRIPTS -->
 <script type="module" src="app.js"></script>
 
 <script>
-  // Init Lucide icons after DOM is ready
-  document.addEventListener("DOMContentLoaded", () => {
-    lucide.createIcons();
-  });
+  document.addEventListener("DOMContentLoaded", () => { lucide.createIcons(); });
 
-  // Re-init after dynamic content (service cards)
-  const origRenderServices = window.renderServices;
-
-  // Chatbot FAB bubble
   let bubbleTimer;
   function toggleChatbot() {
     const bubble = document.getElementById("chatbotBubble");
     bubble.classList.toggle("show");
-    // Auto-hide after 4s
     clearTimeout(bubbleTimer);
     if (bubble.classList.contains("show")) {
       bubbleTimer = setTimeout(() => bubble.classList.remove("show"), 4000);
     }
-    // TODO: conectar a chatbot real aquí
   }
 
-  // Show bubble on first load (after 3 seconds)
   setTimeout(() => {
     const b = document.getElementById("chatbotBubble");
     b.classList.add("show");
