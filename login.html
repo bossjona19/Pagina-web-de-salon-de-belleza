@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eternal Beauty — Acceso Admin</title>
+<title>Eternal Beauty — Acceso</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -14,27 +14,41 @@
   <div class="login-deco login-deco-1"></div>
   <div class="login-deco login-deco-2"></div>
   <div class="login-brand">
-    <div class="login-brand-logo">
-      Eternal<em>Beauty</em>
-    </div>
+    <div class="login-brand-logo">Eternal<em>Beauty</em></div>
     <p class="login-brand-sub">Studio &amp; Spa</p>
     <div class="login-brand-divider"></div>
-    <p class="login-brand-desc">Panel de administración exclusivo para el equipo de Eternal Beauty Studio.</p>
+    <p class="login-brand-desc">
+      Reserva tu cita, gestiona tus visitas y vive la experiencia Eternal Beauty desde cualquier dispositivo.
+    </p>
   </div>
 </div>
 
 <!-- RIGHT PANEL -->
 <div class="login-right">
   <div class="login-box">
-    <h1 class="login-title">Bienvenida, <em>Admin</em></h1>
-    <p class="login-sub">Accede para gestionar tu agenda y reservas</p>
+    <h1 class="login-title">Bienvenida</h1>
+    <p class="login-sub">Accede con tu cuenta Google para reservar o gestionar citas</p>
 
     <div class="error-msg" id="errorMsg"></div>
 
+    <!-- GOOGLE LOGIN (primary) -->
+    <button class="btn-google" id="googleBtn">
+      <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      Continuar con Google
+    </button>
+
+    <div class="login-divider"><span>o acceso con email</span></div>
+
+    <!-- EMAIL/PASSWORD (secondary — admin) -->
     <div class="form-group">
       <label for="email">Correo electrónico</label>
       <div class="input-wrap">
-        <input type="email" id="email" placeholder="admin@eternalbeauty.com" autocomplete="email">
+        <input type="email" id="email" placeholder="12345@gmail.com" autocomplete="email">
         <span class="input-icon">✉</span>
       </div>
     </div>
@@ -47,7 +61,7 @@
       </div>
     </div>
 
-    <button class="btn-login" id="loginBtn" onclick="doLogin()">
+    <button class="btn-login" id="loginBtn">
       <span class="btn-text">Ingresar al panel</span>
       <div class="loading-spinner"></div>
     </button>
@@ -57,54 +71,107 @@
 </div>
 
 <script type="module">
-  import { auth } from "./firebase-config.js";
-  import {
-    signInWithEmailAndPassword,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { auth, db } from './firebase-config.js';
+import {
+  GoogleAuthProvider, signInWithPopup,
+  signInWithEmailAndPassword, onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { doc, getDoc, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-  onAuthStateChanged(auth, user => {
-    if (user) window.location.href = "admin.html";
+const ADMIN_EMAILS = ['admin@eternalbeauty.com'];
+
+// Si ya hay sesión activa, redirigir
+onAuthStateChanged(auth, async user => {
+  if (!user) return;
+  const rol = await getOrCreateUser(user);
+  redirect(rol);
+});
+
+async function getOrCreateUser(user) {
+  const ref  = doc(db, 'usuarios', user.uid);
+  const snap = await getDoc(ref);
+  if (snap.exists()) return snap.data().rol;
+  const rol = ADMIN_EMAILS.includes(user.email) ? 'admin' : 'cliente';
+  await setDoc(ref, {
+    nombre: user.displayName ?? user.email,
+    correo: user.email,
+    foto:   user.photoURL ?? '',
+    fechaRegistro: Timestamp.now(),
+    rol
   });
+  return rol;
+}
 
-  window.doLogin = async function () {
-    const email    = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-    const btn      = document.getElementById("loginBtn");
-    const errBox   = document.getElementById("errorMsg");
+function redirect(rol) {
+  window.location.href = rol === 'admin' ? 'dashboard.html' : 'panel-cliente.html';
+}
 
-    errBox.classList.remove("show");
-    if (!email || !password) {
-      errBox.textContent = "Por favor ingresa tu correo y contraseña.";
-      errBox.classList.add("show");
-      return;
-    }
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.classList.add('show');
+}
 
-    btn.classList.add("loading");
-    btn.disabled = true;
+// ── Google Login ──────────────────────────────────────────────
+document.getElementById('googleBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('googleBtn');
+  btn.disabled = true;
+  btn.textContent = 'Conectando…';
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/calendar.events');
+    const result = await signInWithPopup(auth, provider);
+    const rol = await getOrCreateUser(result.user);
+    redirect(rol);
+  } catch (err) {
+    showError('No se pudo iniciar sesión con Google. Intenta de nuevo.');
+    btn.disabled = false;
+    btn.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      Continuar con Google`;
+  }
+});
 
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      window.location.href = "admin.html";
-    } catch (err) {
-      const msgs = {
-        "auth/user-not-found":     "Usuario no encontrado.",
-        "auth/wrong-password":     "Contraseña incorrecta.",
-        "auth/invalid-email":      "Correo no válido.",
-        "auth/too-many-requests":  "Demasiados intentos. Espera un momento.",
-        "auth/invalid-credential": "Credenciales incorrectas."
-      };
-      errBox.textContent = msgs[err.code] || "Error al iniciar sesión. Intenta de nuevo.";
-      errBox.classList.add("show");
-    } finally {
-      btn.classList.remove("loading");
-      btn.disabled = false;
-    }
-  };
+// ── Email/Password Login ──────────────────────────────────────
+document.getElementById('loginBtn').addEventListener('click', doEmailLogin);
+document.getElementById('password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doEmailLogin();
+});
 
-  document.getElementById("password")?.addEventListener("keydown", e => {
-    if (e.key === "Enter") doLogin();
-  });
+async function doEmailLogin() {
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const btn      = document.getElementById('loginBtn');
+  document.getElementById('errorMsg').classList.remove('show');
+
+  if (!email || !password) {
+    showError('Por favor ingresa tu correo y contraseña.');
+    return;
+  }
+  btn.classList.add('loading');
+  btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    // onAuthStateChanged se encarga de redirigir
+  } catch (err) {
+    const msgs = {
+      'auth/user-not-found':     'Usuario no encontrado.',
+      'auth/wrong-password':     'Contraseña incorrecta.',
+      'auth/invalid-email':      'Correo no válido.',
+      'auth/too-many-requests':  'Demasiados intentos. Espera un momento.',
+      'auth/invalid-credential': 'Credenciales incorrectas.'
+    };
+    showError(msgs[err.code] || 'Error al iniciar sesión. Intenta de nuevo.');
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
 </script>
 </body>
 </html>
