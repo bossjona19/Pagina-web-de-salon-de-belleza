@@ -3,854 +3,311 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eternal Beauty — Panel Admin</title>
-<link rel="stylesheet" href="">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<!-- SheetJS para exportar Excel -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<!-- Chart.js para gráficas -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-
+<title>Admin Panel — Eternal Beauty Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="page-admin">
 
-<button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+<!-- Loading screen -->
+<div id="loadingScreen" style="position:fixed;inset:0;background:var(--beige);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity 0.5s;">
+  <div style="font-family:var(--font-serif);font-size:36px;font-weight:300;letter-spacing:3px;color:var(--text-dark);">Eternal<em style="color:var(--rose);font-style:italic;">Beauty</em></div>
+  <div class="spinner"></div>
+</div>
 
-<!-- ════════ SIDEBAR ════════ -->
+<!-- Mobile menu btn -->
+<button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
+
+<!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-logo">Eternal<em>Beauty</em></div>
-    <div class="sidebar-label">Panel de administración</div>
+    <div class="sidebar-label">Panel Admin</div>
   </div>
 
   <ul class="sidebar-nav">
-    <li class="nav-section">Principal</li>
-    <li><a href="#" class="active" onclick="showTab('dashboard')"><span class="nav-icon">📊</span> Dashboard</a></li>
-    <li><a href="#" onclick="showTab('reservas')"><span class="nav-icon">📅</span> Reservas</a></li>
-    <li><a href="#" onclick="showTab('calendario')"><span class="nav-icon">🗓️</span> Calendario</a></li>
-    <li class="nav-section">Herramientas</li>
-    <li><a href="#" onclick="exportToExcel()"><span class="nav-icon">📥</span> Exportar Excel</a></li>
-    <li><a href="index.html" target="_blank"><span class="nav-icon">🌐</span> Ver sitio</a></li>
-    <li><a href="#" onclick="openWhatsApp()"><span class="nav-icon">💬</span> WhatsApp</a></li>
+    <li class="nav-section-title">Principal</li>
+    <li><a class="active" onclick="switchTab('dashboardTab',this)" href="#"><span class="nav-icon">📊</span> Dashboard</a></li>
+    <li><a onclick="switchTab('calendarTab',this)" href="#"><span class="nav-icon">📅</span> Calendario</a></li>
+    <li><a onclick="switchTab('reservasTab',this)" href="#"><span class="nav-icon">📋</span> Reservas</a></li>
+    <li><a onclick="switchTab('statsTab',this)" href="#"><span class="nav-icon">📈</span> Estadísticas</a></li>
+    <li class="nav-section-title">Herramientas</li>
+    <li><a onclick="exportExcel()" href="#"><span class="nav-icon">⬇️</span> Exportar Excel</a></li>
+    <li><a href="index.html"><span class="nav-icon">🏠</span> Volver al sitio</a></li>
   </ul>
 
   <div class="sidebar-footer">
     <div class="user-info">
-      <div class="user-avatar" id="userAvatar">A</div>
-      <div class="user-details">
-        <div class="user-name" id="userName">Admin</div>
-        <div class="user-email" id="userEmail">cargando…</div>
-      </div>
+      <div class="user-avatar" id="sidebarAvatar">A</div>
+      <div class="user-email" id="sidebarEmail">Cargando…</div>
     </div>
     <button class="btn-logout" onclick="doLogout()">Cerrar sesión</button>
   </div>
 </aside>
 
-<!-- ════════ MAIN ════════ -->
+<!-- ═══ MAIN ═══ -->
 <main class="main">
 
   <!-- Header -->
   <div class="page-header">
     <div>
-      <h1 class="page-title">Bienvenida, <em id="welcomeName">Admin</em></h1>
+      <h1 class="page-title">Panel <em>Admin</em></h1>
       <p class="page-date" id="pageDate"></p>
     </div>
-    <div class="header-actions">
-      <button class="btn-export" onclick="exportToExcel()">
-        📥 Exportar Excel
-      </button>
-      <a href="index.html" target="_blank" style="font-size:11px;color:var(--rose);text-decoration:none;letter-spacing:1px;padding:10px 0;display:flex;align-items:center;">
-        Ver sitio →
-      </a>
+    <div class="page-header-actions">
+      <button class="btn-export" onclick="exportExcel()">⬇️ Exportar Excel</button>
+      <a href="index.html" class="btn-export" style="background:var(--beige-dark);color:var(--text-dark);text-decoration:none;">🏠 Volver al sitio</a>
     </div>
   </div>
 
-  <!-- Tab Nav -->
-  <div class="tab-nav">
-    <button class="tab-btn active" id="tabDashboard" onclick="showTab('dashboard')">📊 Dashboard</button>
-    <button class="tab-btn" id="tabReservas" onclick="showTab('reservas')">📅 Reservas</button>
-    <button class="tab-btn" id="tabCalendario" onclick="showTab('calendario')">🗓️ Calendario</button>
+  <!-- Tabs nav -->
+  <div style="display:flex;border-bottom:2px solid #ede7e0;margin-bottom:28px;">
+    <button class="status-filter active" data-tab="dashboardTab" onclick="switchTab('dashboardTab',this)" style="border-radius:0;padding:12px 24px;border-bottom:2px solid var(--rose);margin-bottom:-2px;">Dashboard</button>
+    <button class="status-filter" data-tab="calendarTab"  onclick="switchTab('calendarTab',this)"  style="border-radius:0;padding:12px 24px;">Calendario</button>
+    <button class="status-filter" data-tab="reservasTab"  onclick="switchTab('reservasTab',this)"  style="border-radius:0;padding:12px 24px;">Reservas</button>
+    <button class="status-filter" data-tab="statsTab"     onclick="switchTab('statsTab',this)"     style="border-radius:0;padding:12px 24px;">Estadísticas</button>
   </div>
 
-  <!-- ══ TAB: DASHBOARD ══ -->
-  <div class="tab-panel active" id="panelDashboard">
+  <!-- ─── TAB DASHBOARD ─── -->
+  <div id="dashboardTab" class="tab-panel active">
 
-    <!-- KPIs -->
     <div class="kpi-grid">
       <div class="kpi-card rose">
-        <span class="kpi-icon">📋</span>
-        <div class="kpi-label">Total reservas</div>
+        <span class="kpi-icon">📅</span>
+        <div class="kpi-label">Total Citas</div>
         <div class="kpi-value" id="kpiTotal">—</div>
-        <div class="kpi-sub">registradas</div>
+        <div class="kpi-sub">Todas las reservas</div>
       </div>
       <div class="kpi-card gold">
         <span class="kpi-icon">⏳</span>
         <div class="kpi-label">Pendientes</div>
-        <div class="kpi-value" id="kpiPendiente">—</div>
-        <div class="kpi-sub">por confirmar</div>
+        <div class="kpi-value" id="kpiPending">—</div>
+        <div class="kpi-sub">Esperando confirmación</div>
       </div>
       <div class="kpi-card green">
         <span class="kpi-icon">✅</span>
         <div class="kpi-label">Confirmadas</div>
-        <div class="kpi-value" id="kpiConfirmada">—</div>
-        <div class="kpi-sub">este mes</div>
+        <div class="kpi-value" id="kpiConfirmed">—</div>
+        <div class="kpi-sub">Este mes</div>
       </div>
       <div class="kpi-card blue">
-        <span class="kpi-icon">⭐</span>
-        <div class="kpi-label">Completadas</div>
-        <div class="kpi-value" id="kpiCompletada">—</div>
-        <div class="kpi-sub">realizadas</div>
+        <span class="kpi-icon">💰</span>
+        <div class="kpi-label">Ingresos Est.</div>
+        <div class="kpi-value" id="kpiRevenue">—</div>
+        <div class="kpi-sub">Citas confirmadas</div>
       </div>
     </div>
 
-    <!-- Charts -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <h2 class="section-card-title">Últimas Reservas</h2>
+        <button class="status-filter" onclick="switchTab('reservasTab',null)">Ver todas →</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cliente</th><th>Servicio</th><th>Fecha</th><th>Hora</th><th>Estado</th><th>Precio</th><th>Acciones</th></tr></thead>
+          <tbody id="recentTableBody">
+            <tr><td colspan="7" class="table-loading"><div class="spinner"></div><br>Cargando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─── TAB CALENDARIO ─── -->
+  <div id="calendarTab" class="tab-panel">
+    <div class="section-card">
+      <div class="section-card-header">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <button class="status-filter" onclick="changeMonth(-1)">‹</button>
+          <h2 class="section-card-title" id="calTitle">Cargando…</h2>
+          <button class="status-filter" onclick="changeMonth(1)">›</button>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:11px;color:var(--text-light);display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--gold);display:inline-block;"></span>Pendiente</span>
+          <span style="font-size:11px;color:var(--text-light);display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:#52c47a;display:inline-block;"></span>Confirmada</span>
+          <span style="font-size:11px;color:var(--text-light);display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--rose);display:inline-block;"></span>Cancelada</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;">
+        <div id="calGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TAB RESERVAS ─── -->
+  <div id="reservasTab" class="tab-panel">
+    <div class="section-card">
+      <div class="section-card-header">
+        <h2 class="section-card-title">Todas las Reservas</h2>
+        <div class="filter-group">
+          <button class="status-filter active" data-filter="todas"      onclick="setTableFilter('todas',this)">Todas</button>
+          <button class="status-filter"        data-filter="pendiente"  onclick="setTableFilter('pendiente',this)">Pendientes</button>
+          <button class="status-filter"        data-filter="confirmada" onclick="setTableFilter('confirmada',this)">Confirmadas</button>
+          <button class="status-filter"        data-filter="cancelada"  onclick="setTableFilter('cancelada',this)">Canceladas</button>
+          <input type="text" class="search-input" id="searchInput" placeholder="Buscar cliente…" oninput="applySearch()">
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cliente</th><th>Servicio</th><th>Fecha</th><th>Hora</th><th>Estado</th><th>Precio</th><th>Acciones</th></tr></thead>
+          <tbody id="fullTableBody">
+            <tr><td colspan="7" class="table-loading"><div class="spinner"></div><br>Cargando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TAB ESTADÍSTICAS ─── -->
+  <div id="statsTab" class="tab-panel">
     <div class="charts-grid">
       <div class="chart-card">
-        <div class="chart-title">Reservas por mes</div>
-        <div class="chart-wrap">
-          <canvas id="chartMeses"></canvas>
-        </div>
+        <h3 class="chart-title">📈 Ingresos mensuales</h3>
+        <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="chart-title">Por servicio</div>
-        <div class="chart-wrap">
-          <canvas id="chartServicios"></canvas>
-        </div>
+        <h3 class="chart-title">🌸 Servicios más solicitados</h3>
+        <div class="chart-wrap"><canvas id="servicesChart"></canvas></div>
       </div>
     </div>
-
-    <!-- Últimas reservas -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <h2 class="section-card-title">Últimas reservas</h2>
-        <button class="btn-primary" onclick="showTab('reservas')">Ver todas →</button>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3 class="chart-title">📊 Citas por estado</h3>
+        <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
       </div>
-      <div class="table-wrap">
-        <div class="table-loading" id="dashTableLoading">
-          <div class="spinner"></div><br>Cargando…
-        </div>
-        <table id="dashTable" style="display:none">
-          <thead>
-            <tr>
-              <th>Cliente</th><th>Servicio</th><th>Fecha</th><th>Estado</th><th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="dashTbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ══ TAB: RESERVAS ══ -->
-  <div class="tab-panel" id="panelReservas">
-    <div class="section-card">
-      <div class="section-card-header">
-        <h2 class="section-card-title">Todas las reservas</h2>
-        <div class="filter-group">
-          <input type="search" class="search-input" id="searchInput" placeholder="Buscar cliente…" oninput="filterTable()">
-          <button class="status-filter active" data-status="all" onclick="filterByStatus('all')">Todas</button>
-          <button class="status-filter" data-status="pendiente" onclick="filterByStatus('pendiente')">Pendientes</button>
-          <button class="status-filter" data-status="confirmada" onclick="filterByStatus('confirmada')">Confirmadas</button>
-          <button class="status-filter" data-status="completada" onclick="filterByStatus('completada')">Completadas</button>
-        </div>
-      </div>
-      <div class="table-wrap">
-        <div class="table-loading" id="tableLoading">
-          <div class="spinner"></div><br>Cargando reservas…
-        </div>
-        <table id="reservasTable" style="display:none">
-          <thead>
-            <tr>
-              <th>Cliente</th><th>Servicio</th><th>Fecha &amp; Hora</th>
-              <th>Teléfono</th><th>Estado</th><th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="reservasTbody"></tbody>
-        </table>
-        <div class="empty-state" id="emptyState" style="display:none">
-          <div class="empty-icon">📭</div>
-          <p>No hay reservas registradas aún.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ TAB: CALENDARIO ══ -->
-  <div class="tab-panel" id="panelCalendario">
-
-    <!-- Google Calendar banner -->
-    <div class="gcal-banner" id="gcalBanner">
-      <div>
-        <p><strong>🗓️ Conectar Google Calendar</strong>
-          Sincroniza tu calendario de Google para ver eventos y bloquear horarios automáticamente.</p>
-      </div>
-      <button class="btn-calendar-connect" id="gcalConnectBtn" onclick="connectGoogleCalendar()">
-        Conectar ahora
-      </button>
-    </div>
-
-    <div class="calendar-section">
-      <!-- Calendar grid -->
-      <div class="calendar-card">
-        <div class="calendar-header">
-          <h2 id="calMonthLabel">Mayo 2026</h2>
-          <div class="calendar-nav">
-            <button onclick="calNav(-1)">‹</button>
-            <span class="month-label" id="calNavLabel"></span>
-            <button onclick="calNav(1)">›</button>
-          </div>
-        </div>
-        <div class="calendar-grid-wrap">
-          <div class="cal-day-headers">
-            <div class="cal-day-header">Dom</div>
-            <div class="cal-day-header">Lun</div>
-            <div class="cal-day-header">Mar</div>
-            <div class="cal-day-header">Mié</div>
-            <div class="cal-day-header">Jue</div>
-            <div class="cal-day-header">Vie</div>
-            <div class="cal-day-header">Sáb</div>
-          </div>
-          <div class="cal-days" id="calDays"></div>
-        </div>
-        <div class="day-detail-panel" id="dayDetailPanel">
-          <div class="day-detail-title" id="dayDetailTitle">Selecciona un día para ver eventos</div>
-          <div id="dayDetailContent"></div>
-        </div>
-      </div>
-
-      <!-- Events sidebar -->
-      <div class="events-sidebar">
-        <div class="events-sidebar-card">
-          <div class="events-header">📋 Reservas próximas</div>
-          <div class="events-list" id="upcomingReservas">
-            <div class="events-empty">Cargando reservas…</div>
-          </div>
-        </div>
-        <div class="events-sidebar-card">
-          <div class="events-header">🗓️ Google Calendar</div>
-          <div class="events-list" id="gcalEventsList">
-            <div class="events-empty">Conecta Google Calendar para ver eventos aquí.</div>
-          </div>
-        </div>
+      <div class="chart-card">
+        <h3 class="chart-title">📅 Citas por mes</h3>
+        <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
       </div>
     </div>
   </div>
 
 </main>
 
-<!-- ════════ DELETE MODAL ════════ -->
-<div class="modal-overlay" id="deleteModal">
-  <div class="modal-box">
-    <div class="modal-icon">🗑️</div>
-    <h2 class="modal-title">Eliminar reserva</h2>
-    <p class="modal-sub" id="deleteModalSub">¿Estás segura de que deseas eliminar esta reserva? Esta acción no se puede deshacer.</p>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
-      <button class="btn-danger" onclick="confirmDelete()">Eliminar</button>
+<!-- ═══ MODAL EDITAR ═══ -->
+<div class="detail-overlay" id="editModal">
+  <div class="detail-modal" style="max-width:480px;border-radius:var(--radius-lg);">
+    <div style="padding:22px 24px 18px;border-bottom:1px solid var(--beige-dark);display:flex;align-items:center;justify-content:space-between;">
+      <h3 style="font-family:var(--font-serif);font-size:24px;font-weight:300;">Editar Cita</h3>
+      <button class="detail-close" onclick="closeAdminModal('editModal')">✕</button>
+    </div>
+    <div class="detail-content">
+      <input type="hidden" id="editDocId">
+      <div class="form-group"><label>Nombre del cliente</label><input type="text" id="editNombre" placeholder="Nombre completo"></div>
+      <div class="form-group">
+        <label>Servicio</label>
+        <select id="editServicio">
+          <option value="">Selecciona…</option>
+          <option>Corte completo</option><option>Keratina</option><option>Pedicura Spa</option>
+          <option>Hidratación Facial</option><option>Manicura Gel</option><option>Tinte de pelo</option>
+          <option>Puntas &amp; Capas</option><option>Pedicura Premium</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Fecha</label><input type="date" id="editFecha"></div>
+        <div class="form-group">
+          <label>Hora</label>
+          <select id="editHora">
+            <option value="">Hora…</option>
+            <option>09:00</option><option>10:00</option><option>11:00</option><option>12:00</option>
+            <option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option>
+            <option>17:00</option><option>18:00</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Estado</label>
+        <select id="editEstado">
+          <option value="pendiente">Pendiente</option><option value="confirmada">Confirmada</option>
+          <option value="cancelada">Cancelada</option><option value="completada">Completada</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Teléfono</label><input type="tel" id="editTelefono" placeholder="+507"></div>
+    </div>
+    <div style="padding:16px 24px 20px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--beige-dark);">
+      <button class="status-filter" onclick="closeAdminModal('editModal')">Cancelar</button>
+      <button class="btn-primary" onclick="saveEdit()">Guardar cambios</button>
     </div>
   </div>
 </div>
 
-<!-- ════════ TOAST ════════ -->
+<!-- ═══ MODAL DÍA CALENDARIO ═══ -->
+<div class="detail-overlay" id="dayModal">
+  <div class="detail-modal" style="max-width:460px;border-radius:var(--radius-lg);">
+    <div style="padding:22px 24px 18px;border-bottom:1px solid var(--beige-dark);display:flex;align-items:center;justify-content:space-between;">
+      <h3 class="section-card-title" id="dayModalTitle">Citas del día</h3>
+      <button class="detail-close" onclick="closeAdminModal('dayModal')">✕</button>
+    </div>
+    <div class="detail-content" style="display:flex;flex-direction:column;gap:10px;" id="dayEventsList"></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL ELIMINAR ═══ -->
+<div class="detail-overlay" id="deleteModal">
+  <div class="detail-modal" style="max-width:420px;border-radius:var(--radius-lg);">
+    <div style="padding:22px 24px 18px;border-bottom:1px solid var(--beige-dark);display:flex;align-items:center;justify-content:space-between;">
+      <h3 style="font-family:var(--font-serif);font-size:24px;font-weight:300;">Eliminar cita</h3>
+      <button class="detail-close" onclick="closeAdminModal('deleteModal')">✕</button>
+    </div>
+    <div class="detail-content">
+      <p style="font-size:14px;color:var(--text-mid);line-height:1.7;">¿Estás segura de que deseas eliminar esta cita? Esta acción no se puede deshacer.</p>
+      <input type="hidden" id="deleteDocId">
+    </div>
+    <div style="padding:16px 24px 20px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--beige-dark);">
+      <button class="status-filter" onclick="closeAdminModal('deleteModal')">Cancelar</button>
+      <button class="btn-primary" style="background:var(--rose-dark);" onclick="confirmDelete()">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- ════════ SCRIPTS ════════ -->
-<script type="module">
-import { auth, db } from "./firebase-config.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  collection, onSnapshot, doc, updateDoc, deleteDoc,
-  orderBy, query, Timestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script type="module" src="Admin.js"></script>
+<script>
+  function switchTab(tabId, triggerEl) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('[data-tab]').forEach(b => {
+      b.classList.remove('active');
+      b.style.borderBottom = '';
+    });
+    document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
 
-// ── Correo admin autorizado ──────────────────────────────────
-// ⚠️ CAMBIA ESTO por el correo real del admin
-const ADMIN_EMAIL = 'admin@eternalbeauty.com';
-
-// ────────────────────────────────────────────────────────────
-// AUTH GUARD
-// ────────────────────────────────────────────────────────────
-onAuthStateChanged(auth, user => {
-  if (!user || user.email !== ADMIN_EMAIL) {
-    window.location.href = 'index.html';
-    return;
-  }
-  // Update UI
-  document.getElementById('userEmail').textContent = user.email;
-  document.getElementById('userName').textContent  = user.displayName || user.email.split('@')[0];
-  document.getElementById('welcomeName').textContent = user.displayName?.split(' ')[0] || 'Admin';
-  const avatarEl = document.getElementById('userAvatar');
-  if (user.photoURL) {
-    avatarEl.innerHTML = `<img src="${user.photoURL}" alt="avatar">`;
-  } else {
-    avatarEl.textContent = user.email[0].toUpperCase();
-  }
-  loadReservas();
-});
-
-document.getElementById('pageDate').textContent = new Date().toLocaleDateString('es-PA', {
-  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-});
-
-window.doLogout = async () => {
-  await signOut(auth);
-  window.location.href = 'index.html';
-};
-
-// ────────────────────────────────────────────────────────────
-// RESERVAS — FIRESTORE
-// ────────────────────────────────────────────────────────────
-let allReservas = [];
-let statusFilter = 'all';
-let deleteTargetId = null;
-let deleteTargetName = '';
-
-function loadReservas() {
-  const q = query(collection(db, 'reservas'), orderBy('creadoEn', 'desc'));
-  onSnapshot(q, snap => {
-    allReservas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    updateKPIs();
-    renderTable();
-    renderDashTable();
-    buildCharts();
-    renderUpcomingReservas();
-    renderCalendar();
-    document.getElementById('tableLoading').style.display     = 'none';
-    document.getElementById('reservasTable').style.display    = 'table';
-    document.getElementById('dashTableLoading').style.display = 'none';
-    document.getElementById('dashTable').style.display        = 'table';
-  }, err => {
-    console.error(err);
-    document.getElementById('tableLoading').innerHTML = "<p style='color:#ed6887;padding:20px'>Error al cargar. Verifica Firebase.</p>";
-  });
-}
-
-// ── KPIs ──────────────────────────────────────────────────────
-function updateKPIs() {
-  document.getElementById('kpiTotal').textContent      = allReservas.length;
-  document.getElementById('kpiPendiente').textContent  = allReservas.filter(r => r.estado === 'pendiente').length;
-  document.getElementById('kpiConfirmada').textContent = allReservas.filter(r => r.estado === 'confirmada').length;
-  document.getElementById('kpiCompletada').textContent = allReservas.filter(r => r.estado === 'completada').length;
-}
-
-// ── Render table (full) ───────────────────────────────────────
-function renderTable(list = null) {
-  const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
-  let data = list ?? allReservas;
-  if (statusFilter !== 'all') data = data.filter(r => r.estado === statusFilter);
-  if (search) data = data.filter(r =>
-    r.nombre?.toLowerCase().includes(search) || r.servicio?.toLowerCase().includes(search)
-  );
-
-  const tbody = document.getElementById('reservasTbody');
-  const empty = document.getElementById('emptyState');
-
-  if (!data.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-  tbody.innerHTML = data.map(r => buildRow(r, true)).join('');
-}
-
-// ── Render dashboard table (last 5) ──────────────────────────
-function renderDashTable() {
-  document.getElementById('dashTbody').innerHTML =
-    allReservas.slice(0, 5).map(r => buildRow(r, false)).join('');
-}
-
-function buildRow(r, full) {
-  const fecha = r.fecha ? `${r.fecha}${r.hora ? ' · ' + r.hora : ''}` : '—';
-  const estadoClass = { pendiente:'badge-pendiente', confirmada:'badge-confirmada', cancelada:'badge-cancelada', completada:'badge-completada' }[r.estado] || 'badge-pendiente';
-  const estadoLabel = { pendiente:'⏳ Pendiente', confirmada:'✅ Confirmada', cancelada:'❌ Cancelada', completada:'⭐ Completada' }[r.estado] || r.estado;
-  const name = escHtml(r.nombre || '—');
-  const svc  = escHtml(r.servicio || '—');
-  const tel  = escHtml(r.telefono || '');
-
-  return `<tr>
-    <td class="td-name">${name}</td>
-    <td class="td-service">${svc}</td>
-    ${full ? `<td>${fecha}</td><td>${tel || '—'}</td>` : ''}
-    <td><span class="badge ${estadoClass}">${estadoLabel}</span></td>
-    <td>
-      <div class="action-btns">
-        ${r.estado === 'pendiente' ? `<button class="btn-action btn-confirm" onclick="cambiarEstado('${r.id}','confirmada')">Confirmar</button>` : ''}
-        ${r.estado !== 'cancelada' && r.estado !== 'completada' ? `<button class="btn-action btn-cancel" onclick="cambiarEstado('${r.id}','cancelada')">Cancelar</button>` : ''}
-        ${r.estado === 'confirmada' ? `<button class="btn-action btn-complete" onclick="cambiarEstado('${r.id}','completada')">Completar</button>` : ''}
-        ${tel ? `<button class="btn-action btn-wa" onclick="contactarCliente('${r.nombre}','${r.servicio}','${tel}','${r.fecha}','${r.hora}')">💬</button>` : ''}
-        <button class="btn-action btn-delete" onclick="openDeleteModal('${r.id}','${name}')">🗑️</button>
-      </div>
-    </td>
-  </tr>`;
-}
-
-// ── Change state ──────────────────────────────────────────────
-window.cambiarEstado = async (id, estado) => {
-  await updateDoc(doc(db, 'reservas', id), { estado });
-  showToast(`Reserva marcada como ${estado}`);
-};
-
-// ── Delete ────────────────────────────────────────────────────
-window.openDeleteModal = (id, name) => {
-  deleteTargetId = id;
-  deleteTargetName = name;
-  document.getElementById('deleteModalSub').textContent =
-    `¿Eliminar la reserva de "${name}"? Esta acción no se puede deshacer.`;
-  document.getElementById('deleteModal').classList.add('open');
-};
-window.closeDeleteModal = () => {
-  document.getElementById('deleteModal').classList.remove('open');
-  deleteTargetId = null;
-};
-window.confirmDelete = async () => {
-  if (!deleteTargetId) return;
-  await deleteDoc(doc(db, 'reservas', deleteTargetId));
-  closeDeleteModal();
-  showToast('Reserva eliminada');
-};
-
-// Close modal on backdrop click
-document.getElementById('deleteModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
-});
-
-// ── Filters ───────────────────────────────────────────────────
-window.filterByStatus = s => {
-  statusFilter = s;
-  document.querySelectorAll('.status-filter').forEach(b =>
-    b.classList.toggle('active', b.dataset.status === s)
-  );
-  renderTable();
-};
-window.filterTable = () => renderTable();
-
-// ── Contact via WhatsApp ──────────────────────────────────────
-window.contactarCliente = (nombre, servicio, telefono, fecha, hora) => {
-  const msg = `Hola ${nombre}! Te contactamos de Eternal Beauty Studio para confirmar tu cita de ${servicio} el ${fecha} a las ${hora}. ¿Confirmas tu asistencia?`;
-  window.open(`https://wa.me/${telefono.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
-};
-window.openWhatsApp = () => window.open('https://wa.me/50765991047', '_blank');
-
-// ────────────────────────────────────────────────────────────
-// CHARTS
-// ────────────────────────────────────────────────────────────
-let chartMeses = null;
-let chartServ  = null;
-
-function buildCharts() {
-  // Reservas por mes (últimos 6 meses)
-  const now = new Date();
-  const meses = [];
-  const counts = [];
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const label = d.toLocaleDateString('es-PA', { month: 'short', year: '2-digit' });
-    const yyyy = d.getFullYear();
-    const mm   = String(d.getMonth() + 1).padStart(2, '0');
-    const cnt  = allReservas.filter(r => r.fecha && r.fecha.startsWith(`${yyyy}-${mm}`)).length;
-    meses.push(label);
-    counts.push(cnt);
-  }
-
-  // Por servicio
-  const svcMap = {};
-  allReservas.forEach(r => {
-    if (r.servicio) svcMap[r.servicio] = (svcMap[r.servicio] || 0) + 1;
-  });
-  const svcLabels = Object.keys(svcMap).slice(0, 7);
-  const svcData   = svcLabels.map(k => svcMap[k]);
-
-  const palette = ['#ed6887','#e6b86a','#6499e9','#52c47a','#c47a52','#a06ee9','#52bec4'];
-
-  if (chartMeses) chartMeses.destroy();
-  if (chartServ)  chartServ.destroy();
-
-  chartMeses = new Chart(document.getElementById('chartMeses').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: meses,
-      datasets: [{
-        label: 'Reservas',
-        data: counts,
-        backgroundColor: 'rgba(237,104,135,0.75)',
-        borderColor: '#ed6887',
-        borderWidth: 2,
-        borderRadius: 6,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Jost', size: 11 } }, grid: { color: '#f0e8e0' } },
-        x: { ticks: { font: { family: 'Jost', size: 11 } }, grid: { display: false } }
-      }
+    document.getElementById(tabId)?.classList.add('active');
+    if (triggerEl) {
+      triggerEl.classList.add('active');
+      if (triggerEl.dataset?.tab) triggerEl.style.borderBottom = '2px solid var(--rose)';
     }
-  });
-
-  chartServ = new Chart(document.getElementById('chartServicios').getContext('2d'), {
-    type: 'doughnut',
-    data: {
-      labels: svcLabels.length ? svcLabels : ['Sin datos'],
-      datasets: [{
-        data: svcData.length ? svcData : [1],
-        backgroundColor: svcLabels.length ? palette.slice(0, svcLabels.length) : ['#e8e0d8'],
-        borderWidth: 2,
-        borderColor: '#fff'
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'bottom', labels: { font: { family: 'Jost', size: 11 }, padding: 14 } }
-      },
-      cutout: '62%'
-    }
-  });
-}
-
-// ────────────────────────────────────────────────────────────
-// EXPORT TO EXCEL
-// ────────────────────────────────────────────────────────────
-window.exportToExcel = () => {
-  if (!allReservas.length) { showToast('No hay reservas para exportar'); return; }
-
-  const data = [
-    ['Nombre', 'Teléfono', 'Servicio', 'Fecha', 'Hora', 'Mensaje', 'Estado', 'Registrado']
-  ];
-  allReservas.forEach(r => {
-    const creado = r.creadoEn?.toDate
-      ? r.creadoEn.toDate().toLocaleDateString('es-PA')
-      : '—';
-    data.push([
-      r.nombre || '', r.telefono || '', r.servicio || '',
-      r.fecha || '', r.hora || '', r.mensaje || '',
-      r.estado || '', creado
-    ]);
-  });
-
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  // Estilo cabecera
-  ws['!cols'] = [
-    {wch:22},{wch:16},{wch:22},{wch:14},{wch:10},{wch:28},{wch:14},{wch:16}
-  ];
-
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Reservas');
-
-  const fecha = new Date().toISOString().slice(0,10);
-  XLSX.writeFile(wb, `EternalBeauty_Reservas_${fecha}.xlsx`);
-  showToast('✅ Excel exportado con éxito');
-};
-
-// ────────────────────────────────────────────────────────────
-// CALENDAR
-// ────────────────────────────────────────────────────────────
-let calYear  = new Date().getFullYear();
-let calMonth = new Date().getMonth(); // 0-based
-let selectedDate = null;
-let gcalEvents = []; // will be populated after Google Calendar connect
-
-const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
-                   'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-
-window.calNav = dir => {
-  calMonth += dir;
-  if (calMonth > 11) { calMonth = 0; calYear++; }
-  if (calMonth < 0)  { calMonth = 11; calYear--; }
-  renderCalendar();
-};
-
-function renderCalendar() {
-  const label = `${MONTHS_ES[calMonth]} ${calYear}`;
-  document.getElementById('calMonthLabel').textContent = label;
-  document.getElementById('calNavLabel').textContent   = label;
-
-  const today = new Date();
-  const firstDay  = new Date(calYear, calMonth, 1).getDay();
-  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-
-  // Build reservas map: date string -> count
-  const reservaMap = {};
-  allReservas.forEach(r => { if (r.fecha) reservaMap[r.fecha] = (reservaMap[r.fecha] || 0) + 1; });
-
-  // Build gcal map
-  const gcalMap = {};
-  gcalEvents.forEach(e => { if (e.date) gcalMap[e.date] = (gcalMap[e.date] || 0) + 1; });
-
-  let html = '';
-  // Prev month filler
-  const prevDays = new Date(calYear, calMonth, 0).getDate();
-  for (let i = firstDay - 1; i >= 0; i--) {
-    html += `<div class="cal-day other-month"><span class="day-num">${prevDays - i}</span></div>`;
-  }
-  // This month
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const isToday = today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d;
-    const isSel   = selectedDate === dateStr;
-    const hasRes  = reservaMap[dateStr];
-    const hasGcal = gcalMap[dateStr];
-    let cls = 'cal-day';
-    if (isToday) cls += ' today';
-    if (isSel)   cls += ' selected';
-    if (hasRes || hasGcal) cls += ' has-events';
-
-    const dots = [
-      hasRes  ? `<span class="dot reserva"></span>`.repeat(Math.min(hasRes, 3)) : '',
-      hasGcal ? `<span class="dot gcal"></span>`.repeat(Math.min(hasGcal, 2)) : ''
-    ].join('');
-
-    html += `<div class="${cls}" onclick="selectDay('${dateStr}')">
-      <span class="day-num">${d}</span>
-      <div class="day-dots">${dots}</div>
-    </div>`;
-  }
-  // Next month filler
-  const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
-  for (let d = 1; d <= totalCells - firstDay - daysInMonth; d++) {
-    html += `<div class="cal-day other-month"><span class="day-num">${d}</span></div>`;
-  }
-
-  document.getElementById('calDays').innerHTML = html;
-}
-
-window.selectDay = dateStr => {
-  selectedDate = dateStr;
-  renderCalendar();
-  showDayDetail(dateStr);
-};
-
-function showDayDetail(dateStr) {
-  const [yyyy, mm, dd] = dateStr.split('-');
-  const label = `${parseInt(dd)} de ${MONTHS_ES[parseInt(mm)-1]} ${yyyy}`;
-  document.getElementById('dayDetailTitle').textContent = label;
-
-  const panel = document.getElementById('dayDetailContent');
-  const reservasDay = allReservas.filter(r => r.fecha === dateStr);
-  const gcalDay     = gcalEvents.filter(e => e.date === dateStr);
-
-  if (!reservasDay.length && !gcalDay.length) {
-    panel.innerHTML = '<p style="font-size:13px;color:#aaa;padding:4px 0">No hay eventos este día.</p>';
-    return;
-  }
-
-  panel.innerHTML = [
-    ...reservasDay.map(r => `
-      <div class="day-event-chip">
-        <span>💅 ${escHtml(r.nombre || '—')} — ${escHtml(r.servicio || '—')}</span>
-        <span class="chip-time">${r.hora || '—'}</span>
-      </div>`),
-    ...gcalDay.map(e => `
-      <div class="day-event-chip gcal">
-        <span>📅 ${escHtml(e.summary || 'Evento')} <small style="color:#6499e9;font-size:10px">[Google]</small></span>
-        <span class="chip-time">${e.time || ''}</span>
-      </div>`)
-  ].join('');
-}
-
-function renderUpcomingReservas() {
-  const today = new Date().toISOString().slice(0,10);
-  const upcoming = allReservas
-    .filter(r => r.fecha >= today && (r.estado === 'pendiente' || r.estado === 'confirmada'))
-    .sort((a,b) => a.fecha.localeCompare(b.fecha))
-    .slice(0, 6);
-
-  const el = document.getElementById('upcomingReservas');
-  if (!upcoming.length) {
-    el.innerHTML = '<div class="events-empty">No hay reservas próximas.</div>';
-    return;
-  }
-  el.innerHTML = upcoming.map(r => `
-    <div class="event-item">
-      <div class="event-color-bar"></div>
-      <div>
-        <div class="event-name">${escHtml(r.nombre || '—')} — ${escHtml(r.servicio || '—')}</div>
-        <div class="event-time">📅 ${r.fecha} ${r.hora ? '· ' + r.hora : ''}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ────────────────────────────────────────────────────────────
-// GOOGLE CALENDAR INTEGRATION
-// Flujo OAuth2 con gapi.client (requiere configuración en Google Cloud)
-// ────────────────────────────────────────────────────────────
-
-// ⚠️ REEMPLAZA con tu Client ID de Google Cloud Console
-const GCAL_CLIENT_ID = 'TU_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
-const GCAL_SCOPES    = 'https://www.googleapis.com/auth/calendar.readonly';
-
-let gcalConnected = false;
-let tokenClient   = null;
-
-// Load Google Identity Services
-const gisScript = document.createElement('script');
-gisScript.src = 'https://accounts.google.com/gsi/client';
-gisScript.onload = initGoogleIdentity;
-document.head.appendChild(gisScript);
-
-// Load GAPI
-const gapiScript = document.createElement('script');
-gapiScript.src = 'https://apis.google.com/js/api.js';
-gapiScript.onload = () => gapi.load('client', initGapiClient);
-document.head.appendChild(gapiScript);
-
-function initGoogleIdentity() {
-  if (!window.google?.accounts?.oauth2) return;
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: GCAL_CLIENT_ID,
-    scope: GCAL_SCOPES,
-    callback: handleGCalToken
-  });
-}
-
-async function initGapiClient() {
-  await gapi.client.init({
-    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
-  });
-}
-
-window.connectGoogleCalendar = () => {
-  if (GCAL_CLIENT_ID === 'TU_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
-    showToast('⚠️ Configura tu GCAL_CLIENT_ID en admin.html primero');
-    showGCalInstructions();
-    return;
-  }
-  if (tokenClient) tokenClient.requestAccessToken();
-};
-
-async function handleGCalToken(tokenResponse) {
-  if (tokenResponse.error) {
-    showToast('Error conectando Google Calendar');
-    return;
-  }
-  gcalConnected = true;
-  document.getElementById('gcalBanner').classList.add('connected');
-  document.getElementById('gcalBanner').querySelector('p').innerHTML =
-    '<strong>✅ Google Calendar conectado</strong>Tus eventos están sincronizados.';
-  document.getElementById('gcalConnectBtn').textContent = '✓ Conectado';
-  document.getElementById('gcalConnectBtn').disabled = true;
-
-  showToast('✅ Google Calendar conectado');
-  await fetchGCalEvents();
-}
-
-async function fetchGCalEvents() {
-  try {
-    const now = new Date();
-    const timeMin = now.toISOString();
-    const timeMax = new Date(now.getFullYear(), now.getMonth() + 2, 0).toISOString();
-
-    const resp = await gapi.client.calendar.events.list({
-      calendarId: 'primary',
-      timeMin, timeMax,
-      singleEvents: true,
-      orderBy: 'startTime',
-      maxResults: 50
+    document.querySelectorAll(`[data-tab="${tabId}"]`).forEach(b => {
+      b.classList.add('active');
+      b.style.borderBottom = '2px solid var(--rose)';
     });
 
-    gcalEvents = (resp.result.items || []).map(e => {
-      const start = e.start?.dateTime || e.start?.date || '';
-      return {
-        id: e.id,
-        summary: e.summary || 'Sin título',
-        date: start.slice(0, 10),
-        time: start.length > 10
-          ? new Date(start).toLocaleTimeString('es-PA', { hour: '2-digit', minute: '2-digit' })
-          : 'Todo el día',
-        isAllDay: !e.start?.dateTime
-      };
-    });
-
-    renderCalendar();
-    renderGCalSidebar();
-
-    // ── Verificar conflictos con reservas ─────────────────────
-    checkConflicts();
-
-  } catch (err) {
-    console.error('Google Calendar error:', err);
-    showToast('Error cargando eventos de Google Calendar');
+    if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+    if (tabId === 'statsTab')    window._adminCharts?.renderAll();
+    if (tabId === 'calendarTab') window._adminCalendar?.render();
   }
-}
+  window.switchTab = switchTab;
 
-function renderGCalSidebar() {
-  const el = document.getElementById('gcalEventsList');
-  const today = new Date().toISOString().slice(0,10);
-  const upcoming = gcalEvents
-    .filter(e => e.date >= today)
-    .slice(0, 8);
+  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+  window.toggleSidebar = toggleSidebar;
 
-  if (!upcoming.length) {
-    el.innerHTML = '<div class="events-empty">No hay eventos próximos en Google Calendar.</div>';
-    return;
-  }
-  el.innerHTML = upcoming.map(e => `
-    <div class="event-item">
-      <div class="event-color-bar gcal"></div>
-      <div>
-        <div class="event-name">${escHtml(e.summary)}</div>
-        <div class="event-time">📅 ${e.date} · ${e.time}</div>
-      </div>
-    </div>
-  `).join('');
-}
+  function closeAdminModal(id) { document.getElementById(id)?.classList.remove('open'); }
+  window.closeAdminModal = closeAdminModal;
 
-function checkConflicts() {
-  // Buscar reservas que coinciden con slots ocupados en Google Calendar
-  const gcalOccupied = new Set(gcalEvents.map(e => `${e.date}_${e.time}`));
-  const conflicts = allReservas.filter(r => {
-    const key = `${r.fecha}_${r.hora}`;
-    return gcalOccupied.has(key) && (r.estado === 'pendiente' || r.estado === 'confirmada');
+  document.querySelectorAll('.detail-overlay').forEach(el => {
+    el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
   });
-  if (conflicts.length > 0) {
-    showToast(`⚠️ ${conflicts.length} reserva(s) tienen conflicto con Google Calendar`);
-  }
-}
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape')
+      document.querySelectorAll('.detail-overlay.open').forEach(m => m.classList.remove('open'));
+  });
 
-function showGCalInstructions() {
-  // Mostrar instrucciones de configuración
-  const banner = document.getElementById('gcalBanner');
-  banner.querySelector('p').innerHTML = `
-    <strong>⚠️ Necesitas configurar Google Calendar</strong>
-    Para conectar, ve al panel de administración → sección Google Calendar y sigue las instrucciones del archivo README o consulta la guía entregada.
-  `;
-}
-
-// ────────────────────────────────────────────────────────────
-// TABS
-// ────────────────────────────────────────────────────────────
-window.showTab = tabId => {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(`panel${capitalize(tabId)}`).classList.add('active');
-  document.getElementById(`tab${capitalize(tabId)}`).classList.add('active');
-  // Update sidebar links
-  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-
-  if (tabId === 'calendario') renderCalendar();
-};
-
-function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-
-// ────────────────────────────────────────────────────────────
-// HELPERS
-// ────────────────────────────────────────────────────────────
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 3500);
-}
-
-// Sidebar mobile
-document.getElementById('mobileMenuBtn').addEventListener('click', () => {
-  document.getElementById('sidebar').classList.toggle('open');
-});
+  document.getElementById('pageDate').textContent =
+    new Date().toLocaleDateString('es-ES', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 </script>
 </body>
 </html>

@@ -1,53 +1,63 @@
 // ============================================================
-// app.js  — Eternal Beauty Studio  (lógica principal)
+// app.js  — Eternal Beauty Studio
+// Toda la lógica del sitio público (index.html)
 // ============================================================
 
-import { auth } from "./firebase-config.js";
-import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { db } from "./firebase-config.js";
-import { collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { auth, db } from "./firebase-config.js";
+import {
+  onAuthStateChanged, signOut,
+  GoogleAuthProvider, signInWithPopup,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  collection, addDoc, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ─── CORREO ADMIN AUTORIZADO ──────────────────────────────────
+// ⚠️  Cámbialo por el correo real del admin
+const ADMIN_EMAIL = "admin@eternalbeauty.com";
 
 // ─── DATOS ───────────────────────────────────────────────────
 const SERVICES = [
-  { id: 1, name: "Corte completo", category: "corte",
+  { id: 1, name: "Corte completo",      category: "corte",
     img: "https://www.shutterstock.com/image-photo/salon-job-hair-stylist-braids-260nw-2317955141.jpg",
-    price: "$65", duration: "90 min",
+    price: "$65",  duration: "90 min",
     description: "Corte personalizado según tu forma de rostro y tipo de cabello. Incluye lavado, tratamiento hidratante y peinado final profesional." },
-  { id: 2, name: "Keratina", category: "tratamientos",
+  { id: 2, name: "Keratina",            category: "tratamientos",
     img: "https://directoriotierrasaltas.com/wp-content/uploads/2020/06/directorio-tierras-altas-keratinas-eva4-1200x1200.jpg",
     price: "$120", duration: "120 min",
     description: "Alisado semipermanente que elimina el frizz y da brillo intenso. Resultados que duran hasta 4 meses. Libre de formaldehído." },
-  { id: 3, name: "Pedicura Spa", category: "uñas",
+  { id: 3, name: "Pedicura Spa",        category: "uñas",
     img: "https://www.telebelleza.es/img/cms/manicura_pedicura_pagina.jpg",
-    price: "$55", duration: "75 min",
+    price: "$55",  duration: "75 min",
     description: "Limpieza profunda, exfoliación, masaje relajante y esmaltado. Tus pies merecen el mejor cuidado." },
-  { id: 4, name: "Hidratación Facial", category: "faciales",
-    img: "https://lulabeauty.co/cdn/shop/files/Complementarias_lapices_cejas_Mesa_de_trabajo_1_copia_16.jpg?crop=center&height=2250&v=1753132958&width=2250",
-    price: "$70", duration: "60 min",
+  { id: 4, name: "Hidratación Facial",  category: "faciales",
+    img: "https://lulabeauty.co/cdn/shop/files/Complementarias_lapices_cejas_Mesa_de_trabajo_1_copia_16.jpg",
+    price: "$70",  duration: "60 min",
     description: "Tratamiento de hidratación profunda con ácido hialurónico y activos botánicos. Efecto luminoso inmediato." },
-  { id: 5, name: "Manicura Gel", category: "uñas",
+  { id: 5, name: "Manicura Gel",        category: "uñas",
     img: "https://media.glamour.mx/photos/61f055d8e95d4d02a8681c4f/16:9/w_2256,h_1269,c_limit/disen%CC%83osdeun%CC%83asblancoynegro.jpg",
-    price: "$35", duration: "45 min",
+    price: "$35",  duration: "45 min",
     description: "Manicura con esmalte gel de larga duración. Hasta 3 semanas sin astillas. Acabado salon-perfect." },
-  { id: 6, name: "Tinte de pelo", category: "tratamientos",
-    img: "https://img.freepik.com/foto-gratis/mujer-lavando-su-cabello-salon-belleza_23-2149167387.jpg?semt=ais_hybrid&w=740&q=80",
+  { id: 6, name: "Tinte de pelo",       category: "tratamientos",
+    img: "https://img.freepik.com/foto-gratis/mujer-lavando-su-cabello-salon-belleza_23-2149167387.jpg",
     price: "$180", duration: "150 min",
     description: "Color profesional con técnicas de balayage, mechas o tinte uniforme. Incluye tratamiento de brillo post-color." },
-  { id: 7, name: "Puntas & Capas", category: "corte",
+  { id: 7, name: "Puntas & Capas",      category: "corte",
     img: "https://e00-telva.uecdn.es/assets/multimedia/imagenes/2020/01/28/15802411454678.jpg",
-    price: "$50", duration: "60 min",
+    price: "$50",  duration: "60 min",
     description: "Eliminación de puntas abiertas y capas que dan movimiento y volumen natural a tu cabello." },
-  { id: 8, name: "Pedicura Premium", category: "tratamientos",
+  { id: 8, name: "Pedicura Premium",    category: "tratamientos",
     img: "https://inesbe.com/wp-content/smush-webp/2024/04/woman-enjoying-pedicure-spa-treatment-at-a-beauty-2023-11-27-05-24-21-utc-1-1-1024x683.jpg.webp",
-    price: "$90", duration: "90 min",
+    price: "$90",  duration: "90 min",
     description: "Experiencia spa completa: baño de pies, masaje con aromaterapia, exfoliación y esmaltado premium." }
 ];
 
 const CATEGORIES = [
-  { id: "all", label: "Todos" },
-  { id: "corte", label: "Corte" },
-  { id: "faciales", label: "Faciales" },
-  { id: "uñas", label: "Uñas" },
+  { id: "all",          label: "Todos" },
+  { id: "corte",        label: "Corte" },
+  { id: "faciales",     label: "Faciales" },
+  { id: "uñas",         label: "Uñas" },
   { id: "tratamientos", label: "Tratamientos" }
 ];
 
@@ -58,19 +68,127 @@ const BLOCKED_HOURS = {
 
 let currentFilter = "all";
 
-// ─── FILTERS ─────────────────────────────────────────────────
+// ════════════════════════════════════════
+// LOGIN MODAL
+// ════════════════════════════════════════
+
+function isAdmin(email) {
+  return email === ADMIN_EMAIL;
+}
+
+// Abre el modal
+window.openLoginModal = () => {
+  document.getElementById("loginBackdrop").classList.add("open");
+  document.body.style.overflow = "hidden";
+  setTimeout(() => document.getElementById("lmEmail")?.focus(), 350);
+};
+
+// Cierra el modal
+window.closeLoginModal = () => {
+  document.getElementById("loginBackdrop").classList.remove("open");
+  document.body.style.overflow = "";
+  _lmClearError();
+};
+
+// Clic en el fondo cierra el modal
+window.handleBackdropClick = (e) => {
+  if (e.target.id === "loginBackdrop") window.closeLoginModal();
+};
+
+// Mostrar / ocultar contraseña
+window.togglePass = () => {
+  const inp = document.getElementById("lmPassword");
+  inp.type = inp.type === "password" ? "text" : "password";
+};
+
+function _lmShowError(msg) {
+  const el = document.getElementById("lmError");
+  el.textContent = msg;
+  el.classList.add("show");
+}
+function _lmClearError() {
+  document.getElementById("lmError")?.classList.remove("show");
+}
+function _lmSetLoading(on) {
+  const btn = document.getElementById("lmSubmitBtn");
+  btn.disabled = on;
+  btn.classList.toggle("loading", on);
+}
+
+// Login con Google
+window.doGoogleLogin = async () => {
+  _lmClearError();
+  const btn = document.getElementById("lmGoogleBtn");
+  btn.disabled = true;
+  const originalHTML = btn.innerHTML;
+  btn.textContent = "Conectando…";
+  try {
+    const provider = new GoogleAuthProvider();
+    const result   = await signInWithPopup(auth, provider);
+    if (!isAdmin(result.user.email)) {
+      await signOut(auth);
+      _lmShowError(`La cuenta ${result.user.email} no tiene acceso al panel admin.`);
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
+      return;
+    }
+    window.location.href = "admin.html";
+  } catch {
+    _lmShowError("No se pudo iniciar sesión con Google. Intenta de nuevo.");
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+  }
+};
+
+// Login con correo y contraseña
+window.doEmailLogin = async () => {
+  _lmClearError();
+  const email    = document.getElementById("lmEmail").value.trim();
+  const password = document.getElementById("lmPassword").value;
+  if (!email || !password) { _lmShowError("Ingresa correo y contraseña."); return; }
+  if (!isAdmin(email))     { _lmShowError("Este correo no tiene permisos de administrador."); return; }
+
+  _lmSetLoading(true);
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.href = "admin.html";
+  } catch (err) {
+    const msgs = {
+      "auth/user-not-found":     "Usuario no encontrado.",
+      "auth/wrong-password":     "Contraseña incorrecta.",
+      "auth/invalid-email":      "Correo no válido.",
+      "auth/too-many-requests":  "Demasiados intentos. Espera un momento.",
+      "auth/invalid-credential": "Correo o contraseña incorrectos."
+    };
+    _lmShowError(msgs[err.code] || "Error al iniciar sesión. Intenta de nuevo.");
+  } finally {
+    _lmSetLoading(false);
+  }
+};
+
+// ─── Auth guard: si ya está logueado como admin, mostrar link ──
+onAuthStateChanged(auth, user => {
+  const adminLink = document.getElementById("adminLink");
+  if (adminLink) adminLink.style.display = (user && isAdmin(user.email)) ? "inline-block" : "none";
+});
+
+// Teclas del modal
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") window.closeLoginModal?.();
+});
+
+// ════════════════════════════════════════
+// FILTROS DE SERVICIOS
+// ════════════════════════════════════════
 function renderFilters() {
   const el = document.getElementById("filters");
   if (!el) return;
   el.innerHTML = CATEGORIES.map(c =>
-    `<button class="filter-btn ${c.id === "all" ? "active" : ""}" data-cat="${c.id}">
-       ${c.label}
-     </button>`
+    `<button class="filter-btn ${c.id === "all" ? "active" : ""}" data-cat="${c.id}">${c.label}</button>`
   ).join("");
-
-  el.querySelectorAll(".filter-btn").forEach(btn => {
-    btn.addEventListener("click", () => setFilter(btn.dataset.cat));
-  });
+  el.querySelectorAll(".filter-btn").forEach(btn =>
+    btn.addEventListener("click", () => setFilter(btn.dataset.cat))
+  );
 }
 
 function setFilter(cat) {
@@ -81,7 +199,9 @@ function setFilter(cat) {
   renderServices();
 }
 
-// ─── SERVICES GRID ───────────────────────────────────────────
+// ════════════════════════════════════════
+// GRID DE SERVICIOS
+// ════════════════════════════════════════
 function renderServices() {
   const grid = document.getElementById("servicesGrid");
   if (!grid) return;
@@ -106,31 +226,31 @@ function renderServices() {
     </article>
   `).join("");
 
-  // animate in
   requestAnimationFrame(() => {
-    grid.querySelectorAll(".service-card").forEach((c, i) => {
-      setTimeout(() => c.classList.add("visible"), i * 80);
-    });
+    grid.querySelectorAll(".service-card").forEach((c, i) =>
+      setTimeout(() => c.classList.add("visible"), i * 80)
+    );
   });
 
-  // events
-  grid.querySelectorAll(".service-card").forEach(card => {
-    card.addEventListener("click", () => openDetail(+card.dataset.id));
-  });
+  grid.querySelectorAll(".service-card").forEach(card =>
+    card.addEventListener("click", () => openDetail(+card.dataset.id))
+  );
 
   populateSelect();
 }
 
-// ─── SERVICE DETAIL ──────────────────────────────────────────
+// ════════════════════════════════════════
+// DETALLE DE SERVICIO
+// ════════════════════════════════════════
 function openDetail(id) {
   const s = SERVICES.find(x => x.id === id);
   if (!s) return;
-  document.getElementById("detailImg").src   = s.img;
-  document.getElementById("detailImg").alt   = s.name;
-  document.getElementById("detailTag").textContent  = `${s.category} · ${s.duration}`;
-  document.getElementById("detailName").textContent = s.name;
-  document.getElementById("detailDesc").textContent = s.description;
-  document.getElementById("detailPrice").textContent = s.price;
+  document.getElementById("detailImg").src            = s.img;
+  document.getElementById("detailImg").alt            = s.name;
+  document.getElementById("detailTag").textContent    = `${s.category} · ${s.duration}`;
+  document.getElementById("detailName").textContent   = s.name;
+  document.getElementById("detailDesc").textContent   = s.description;
+  document.getElementById("detailPrice").textContent  = s.price;
   document.getElementById("detailOverlay").classList.add("open");
   document.body.style.overflow = "hidden";
 }
@@ -139,14 +259,14 @@ function closeDetailDirect() {
   document.getElementById("detailOverlay").classList.remove("open");
   document.body.style.overflow = "";
 }
-
 window.closeDetailDirect = closeDetailDirect;
 
+// Cerrar al hacer clic en el fondo
 document.getElementById("detailOverlay")?.addEventListener("click", e => {
   if (e.target === document.getElementById("detailOverlay")) closeDetailDirect();
 });
 
-// ─── RESERVE FROM DETAIL ─────────────────────────────────────
+// Reservar desde el detalle
 window.reservarServicio = function () {
   const servicio = document.getElementById("detailName").textContent;
   closeDetailDirect();
@@ -157,22 +277,30 @@ window.reservarServicio = function () {
   }, 600);
 };
 
-// ─── WHATSAPP ────────────────────────────────────────────────
+// ════════════════════════════════════════
+// WHATSAPP
+// ════════════════════════════════════════
 window.openWhatsApp = function (msg) {
   const text = msg || "Hola! Me gustaría reservar una cita en Eternal Beauty Studio.";
   window.open(`https://wa.me/50765991047?text=${encodeURIComponent(text)}`, "_blank");
 };
 
-// ─── SELECT POPULATE ─────────────────────────────────────────
+// ════════════════════════════════════════
+// SELECT DE SERVICIOS EN EL FORMULARIO
+// ════════════════════════════════════════
 function populateSelect() {
   const sel = document.getElementById("fservice");
   if (!sel) return;
   const cur = sel.value;
   sel.innerHTML = '<option value="">Selecciona un servicio</option>' +
-    SERVICES.map(s => `<option value="${s.name}" ${s.name === cur ? "selected" : ""}>${s.name} — ${s.price}</option>`).join("");
+    SERVICES.map(s =>
+      `<option value="${s.name}" ${s.name === cur ? "selected" : ""}>${s.name} — ${s.price}</option>`
+    ).join("");
 }
 
-// ─── HOURS ───────────────────────────────────────────────────
+// ════════════════════════════════════════
+// HORAS DISPONIBLES
+// ════════════════════════════════════════
 function generarHoras() {
   const sel   = document.getElementById("fhour");
   const fecha = document.getElementById("fdate")?.value || "";
@@ -180,7 +308,7 @@ function generarHoras() {
   const ocupadas = BLOCKED_HOURS[fecha] || [];
   let html = '<option value="">Selecciona una hora</option>';
   for (let h = 9; h <= 18; h++) {
-    const hora = `${String(h).padStart(2,"0")}:00`;
+    const hora = `${String(h).padStart(2, "0")}:00`;
     const busy = ocupadas.includes(hora);
     html += `<option value="${hora}" ${busy ? "disabled" : ""}>${hora}${busy ? " (ocupado)" : ""}</option>`;
   }
@@ -188,128 +316,75 @@ function generarHoras() {
 }
 
 document.getElementById("fdate")?.addEventListener("change", generarHoras);
-generarHoras();
 
-// ─── FORM SUBMIT → FIRESTORE + WHATSAPP ──────────────────────
+// ════════════════════════════════════════
+// FORMULARIO → FIRESTORE + WHATSAPP
+// ════════════════════════════════════════
 async function submitForm() {
+  const btn  = document.getElementById("submitBtn");
+  if (btn) { btn.disabled = true; btn.textContent = "Enviando..."; }
 
-  const btn = document.getElementById("submitBtn");
+  const name    = document.getElementById("fname")?.value.trim()   || "";
+  const phone   = document.getElementById("fphone")?.value.trim()  || "";
+  const service = document.getElementById("fservice")?.value       || "";
+  const date    = document.getElementById("fdate")?.value          || "";
+  const hour    = document.getElementById("fhour")?.value          || "";
+  const msg     = document.getElementById("fmsg")?.value.trim()    || "";
 
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = "Enviando...";
-  }
-
-  const name    = document.getElementById("fname")?.value.trim() || "";
-  const phone   = document.getElementById("fphone")?.value.trim() || "";
-  const service = document.getElementById("fservice")?.value || "";
-  const date    = document.getElementById("fdate")?.value || "";
-  const hour    = document.getElementById("fhour")?.value || "";
-  const msg     = document.getElementById("fmsg")?.value.trim() || "";
-
-  document.querySelectorAll(".form-error").forEach(e => {
-    e.classList.remove("show");
-  });
+  // Limpiar errores anteriores
+  document.querySelectorAll(".form-error").forEach(e => e.classList.remove("show"));
 
   let valid = true;
-
-  if (!name) {
-    document.getElementById("fname-error").classList.add("show");
-    valid = false;
-  }
-
-  if (!phone || phone.length < 6) {
-    document.getElementById("fphone-error").classList.add("show");
-    valid = false;
-  }
-
-  if (!service) {
-    document.getElementById("fservice-error").classList.add("show");
-    valid = false;
-  }
+  if (!name)              { document.getElementById("fname-error").classList.add("show");    valid = false; }
+  if (!phone || phone.length < 6) { document.getElementById("fphone-error").classList.add("show");   valid = false; }
+  if (!service)           { document.getElementById("fservice-error").classList.add("show"); valid = false; }
 
   if (!valid) {
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = "Enviar solicitud";
-    }
+    if (btn) { btn.disabled = false; btn.textContent = "Enviar solicitud"; }
     return;
   }
 
+  // Guardar en Firestore
   try {
-
     await addDoc(collection(db, "reservas"), {
-      nombre: name,
+      nombre:   name,
       telefono: phone,
       servicio: service,
-      fecha: date,
-      hora: hour,
-      mensaje: msg,
-      estado: "pendiente",
+      fecha:    date,
+      hora:     hour,
+      mensaje:  msg,
+      estado:   "pendiente",
       creadoEn: Timestamp.now()
     });
-
   } catch (err) {
-    console.log("Firestore:", err.message);
+    console.warn("Firestore:", err.message);
   }
 
-  const waMsg = `Hola, quiero reservar una cita:
+  // Abrir WhatsApp
+  const waMsg = `Hola, quiero reservar una cita:\n\n👤 Nombre: ${name}\n📱 Teléfono: ${phone}\n✂️ Servicio: ${service}\n📅 Fecha: ${date || "No especificada"}\n🕐 Hora: ${hour || "No especificada"}\n💬 Mensaje: ${msg || "Ninguno"}`;
+  window.open(`https://wa.me/50765991047?text=${encodeURIComponent(waMsg)}`, "_blank");
 
-👤 Nombre: ${name}
-📱 Teléfono: ${phone}
-✂️ Servicio: ${service}
-📅 Fecha: ${date || "No especificada"}
-🕐 Hora: ${hour || "No especificada"}
-💬 Mensaje: ${msg || "Ninguno"}`;
-
-  const waURL = `https://wa.me/50765991047?text=${encodeURIComponent(waMsg)}`;
-
-  window.open(waURL, "_blank");
-
-  document.getElementById("fname").value = "";
-  document.getElementById("fphone").value = "";
-  document.getElementById("fservice").value = "";
-  document.getElementById("fdate").value = "";
-  document.getElementById("fhour").value = "";
-  document.getElementById("fmsg").value = "";
-
+  // Resetear formulario
+  ["fname", "fphone", "fservice", "fdate", "fhour", "fmsg"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
   generarHoras();
 
+  // Mostrar mensaje de éxito
   const ok = document.getElementById("successMsg");
-
   if (ok) {
     ok.classList.add("show");
-
-    setTimeout(() => {
-      ok.classList.remove("show");
-    }, 5000);
+    setTimeout(() => ok.classList.remove("show"), 5000);
   }
 
-  if (btn) {
-    btn.disabled = false;
-    btn.textContent = "Enviar solicitud";
-  }
+  if (btn) { btn.disabled = false; btn.textContent = "Enviar solicitud"; }
 }
-
 window.submitForm = submitForm;
 
-document.addEventListener("DOMContentLoaded", () => {
-
-  renderFilters();
-  renderServices();
-  initScrollAnimations();
-
-  initSlider("ba1", "afterWrap1", "baDivider1", "baHandle1");
-  initSlider("ba2", "afterWrap2", "baDivider2", "baHandle2");
-
-  const submitBtn = document.getElementById("submitBtn");
-
-  if (submitBtn) {
-    submitBtn.addEventListener("click", submitForm);
-  }
-
-});
-// ─── SCROLL ANIMATIONS ───────────────────────────────────────
+// ════════════════════════════════════════
+// ANIMACIONES AL HACER SCROLL
+// ════════════════════════════════════════
 function initScrollAnimations() {
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -319,36 +394,46 @@ function initScrollAnimations() {
   document.querySelectorAll(".fade-up, .gallery-item").forEach(el => io.observe(el));
 }
 
-// ─── HAMBURGER ───────────────────────────────────────────────
+// ════════════════════════════════════════
+// HAMBURGER (MÓVIL)
+// ════════════════════════════════════════
 window.toggleMobileNav = function () {
-  document.getElementById("mobileNav").classList.toggle("open");
-  document.getElementById("hamburger").classList.toggle("open");
+  document.getElementById("mobileNav")?.classList.toggle("open");
+  document.getElementById("hamburger")?.classList.toggle("open");
 };
 window.closeMobileNav = function () {
   document.getElementById("mobileNav")?.classList.remove("open");
   document.getElementById("hamburger")?.classList.remove("open");
 };
 
-// ─── NAV SCROLL ──────────────────────────────────────────────
+// ════════════════════════════════════════
+// NAV SCROLL
+// ════════════════════════════════════════
 window.addEventListener("scroll", () => {
   document.getElementById("navbar")?.classList.toggle("scrolled", window.scrollY > 40);
 });
 
-// ─── GALLERY SCROLL ──────────────────────────────────────────
+// ════════════════════════════════════════
+// GALERÍA SCROLL
+// ════════════════════════════════════════
 window.scrollGallery = function (dir) {
   const c = document.getElementById("gallery");
   if (!c) return;
   const max = c.scrollWidth - c.clientWidth;
-  if (dir === 1 && c.scrollLeft >= max - 10) c.scrollTo({ left: 0, behavior: "smooth" });
-  else if (dir === -1 && c.scrollLeft <= 0) c.scrollTo({ left: max, behavior: "smooth" });
-  else c.scrollBy({ left: dir * 300, behavior: "smooth" });
+  if      (dir ===  1 && c.scrollLeft >= max - 10) c.scrollTo({ left: 0,   behavior: "smooth" });
+  else if (dir === -1 && c.scrollLeft <= 0)         c.scrollTo({ left: max, behavior: "smooth" });
+  else    c.scrollBy({ left: dir * 300, behavior: "smooth" });
 };
 
-// ─── IMAGE MODAL ─────────────────────────────────────────────
+// ════════════════════════════════════════
+// MODAL DE IMAGEN
+// ════════════════════════════════════════
 window.openModal  = src => { document.getElementById("modalImg").src = src; document.getElementById("imageModal").classList.add("show"); };
 window.closeModal = ()  => document.getElementById("imageModal")?.classList.remove("show");
 
-// ─── BEFORE / AFTER SLIDER ───────────────────────────────────
+// ════════════════════════════════════════
+// BEFORE / AFTER SLIDER
+// ════════════════════════════════════════
 function initSlider(containerId, afterWrapId, dividerId, handleId) {
   const container = document.getElementById(containerId);
   const afterWrap = document.getElementById(afterWrapId);
@@ -362,31 +447,39 @@ function initSlider(containerId, afterWrapId, dividerId, handleId) {
     const rect = container.getBoundingClientRect();
     afterWrap.querySelector("img").style.width = rect.width + "px";
     const pct = Math.max(0, Math.min((clientX - rect.left) / rect.width, 1)) * 100;
-    afterWrap.style.width = `${pct}%`;
-    divider.style.left = `${pct}%`;
-    handle.style.left = `calc(${pct}% - 0px)`;
+    afterWrap.style.width  = `${pct}%`;
+    divider.style.left     = `${pct}%`;
+    handle.style.left      = `calc(${pct}% - 0px)`;
   }
 
-  handle.addEventListener("mousedown",  e => { e.preventDefault(); dragging = true; container.classList.add("dragging"); });
-  handle.addEventListener("touchstart", () => { dragging = true; container.classList.add("dragging"); }, { passive: true });
-  window.addEventListener("mousemove",  e => { if (dragging) setPos(e.clientX); });
-  window.addEventListener("touchmove",  e => { if (dragging) { e.preventDefault(); setPos(e.touches[0].clientX); } }, { passive: false });
-  ["mouseup","touchend","touchcancel"].forEach(ev =>
+  handle.addEventListener("mousedown",  e => { e.preventDefault(); dragging = true;  container.classList.add("dragging"); });
+  handle.addEventListener("touchstart", ()  => { dragging = true;  container.classList.add("dragging"); }, { passive: true });
+  window.addEventListener("mousemove",  e   => { if (dragging) setPos(e.clientX); });
+  window.addEventListener("touchmove",  e   => { if (dragging) { e.preventDefault(); setPos(e.touches[0].clientX); } }, { passive: false });
+  ["mouseup", "touchend", "touchcancel"].forEach(ev =>
     window.addEventListener(ev, () => { dragging = false; container.classList.remove("dragging"); })
   );
 }
 
-// ─── AUTH GUARD (link admin) ─────────────────────────────────
-onAuthStateChanged(auth, user => {
-  const adminLink = document.getElementById("adminLink");
-  if (adminLink) adminLink.style.display = user ? "inline-block" : "none";
-});
-
-// ─── INIT ────────────────────────────────────────────────────
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", () => {
+  // Inicializar campo de password — Enter para submit
+  document.getElementById("lmPassword")?.addEventListener("keydown", e => {
+    if (e.key === "Enter") window.doEmailLogin();
+  });
+
   renderFilters();
   renderServices();
+  generarHoras();
   initScrollAnimations();
   initSlider("ba1", "afterWrap1", "baDivider1", "baHandle1");
   initSlider("ba2", "afterWrap2", "baDivider2", "baHandle2");
+
+  // Botón submit del formulario
+  document.getElementById("submitBtn")?.addEventListener("click", submitForm);
+
+  // Lucide icons
+  if (window.lucide) lucide.createIcons();
 });
