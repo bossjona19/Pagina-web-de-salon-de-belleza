@@ -18,7 +18,7 @@ import {
   deleteDoc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { addCalendarEvent, removeCalendarEvent } from "./calendar.js";
+import { addCalendarEvent, removeCalendarEvent } from "./Calendar.js";
 
 // ─── CONFIG — agrega aquí los correos de cada admin ──────────
 const ADMIN_EMAILS = [
