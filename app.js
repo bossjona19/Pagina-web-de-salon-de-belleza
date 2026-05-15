@@ -444,7 +444,7 @@ window.handleGoogleLogin = async function () {
   if (btn) { btn.disabled = true; btn.textContent = "Conectando…"; }
   try {
     await signInWithPopup(auth, new GoogleAuthProvider());
-    window.location.href = "admin2341.html";
+    window.location.href = "admin.html";
   } catch (err) {
     showLoginError(AUTH_ERRORS[err.code] || "Error al iniciar sesión con Google.");
     if (btn) {
@@ -461,7 +461,7 @@ window.handleAdminLogin = async function () {
   setLoginLoading(true);
   try {
     await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "admin2341.html";
+    window.location.href = "admin.html";
   } catch (err) {
     showLoginError(AUTH_ERRORS[err.code] || "Error al iniciar sesión.");
     setLoginLoading(false);
