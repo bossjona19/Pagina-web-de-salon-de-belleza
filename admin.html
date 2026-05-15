@@ -411,6 +411,7 @@ tbody tr:hover td{background:#fdf9f6;}
 <div id="loadingScreen">
   <div class="ls-logo">Eternal<em>Beauty</em></div>
   <div class="spinner"></div>
+  <p id="loadingMsg" style="font-size:13px;color:var(--ink-lt);margin-top:8px;font-family:var(--font-sans);opacity:0;transition:opacity .4s;">Verificando sesión…</p>
 </div>
 
 <!-- Mobile overlay -->
@@ -773,6 +774,25 @@ tbody tr:hover td{background:#fdf9f6;}
 
   document.getElementById('pageDate').textContent =
     new Date().toLocaleDateString('es-ES', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  // ── Loading screen safety timeout ───────────────────────
+  // Si Firebase Auth no responde en 3s, muestra el mensaje; si no responde en 10s, redirige al login
+  const _msgTimer = setTimeout(function() {
+    const m = document.getElementById('loadingMsg');
+    if (m) m.style.opacity = '1';
+  }, 3000);
+
+  const _authTimer = setTimeout(function() {
+    if (document.getElementById('loadingScreen')) {
+      window.location.href = 'index.html';
+    }
+  }, 10000);
+
+  // Admin.js llama a esta función para cancelar el timeout cuando auth resuelve
+  window._cancelAuthTimer = function() {
+    clearTimeout(_msgTimer);
+    clearTimeout(_authTimer);
+  };
 </script>
 </body>
 </html>
