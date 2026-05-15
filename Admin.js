@@ -135,8 +135,15 @@ onAuthStateChanged(auth, user => {
   if (emailEl)  emailEl.textContent = user.email;
   if (avatarEl) avatarEl.textContent = user.displayName?.[0]?.toUpperCase() || "A";
 
-  initRealtimeListener();
+  // Ocultar loading ANTES de Firestore para que nunca quede pegada
   hideLoading();
+
+  try {
+    initRealtimeListener();
+  } catch (err) {
+    console.error("Error iniciando Firestore:", err);
+    showToast("⚠️ Error conectando con la base de datos.");
+  }
 });
 
 // ─── LOGOUT ──────────────────────────────────────────────────
