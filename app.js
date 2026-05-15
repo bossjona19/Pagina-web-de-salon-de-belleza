@@ -182,6 +182,35 @@ function populateSelect() {
 }
 
 // ════════════════════════════════════════
+// DURACIÓN POR SERVICIO (en minutos)
+// ════════════════════════════════════════
+function getDuracion(nombreServicio) {
+  const s = SERVICES.find(x => x.name === nombreServicio);
+  return s ? (parseInt(s.duration) || 60) : 60;
+}
+
+// Buffer de preparación entre citas (minutos)
+const BUFFER_MIN = 30;
+
+// Calcula qué horas quedan bloqueadas considerando duración + buffer de preparación
+function calcHorasOcupadas(reservaciones) {
+  const bloqueadas = new Set();
+  reservaciones.forEach(({ hora, servicio }) => {
+    if (!hora) return;
+    const hh        = parseInt(hora.split(":")[0]);
+    const inicioMin = hh * 60;
+    // Bloquea: duración del servicio + 30 min de buffer (limpieza / preparación)
+    const totalMin  = getDuracion(servicio) + BUFFER_MIN;
+    for (let h = 9; h <= 18; h++) {
+      if (h * 60 >= inicioMin && h * 60 < inicioMin + totalMin) {
+        bloqueadas.add(`${String(h).padStart(2, "0")}:00`);
+      }
+    }
+  });
+  return bloqueadas;
+}
+
+// ════════════════════════════════════════
 // HORAS DISPONIBLES (desde Firestore)
 // ════════════════════════════════════════
 async function generarHoras() {
@@ -192,7 +221,7 @@ async function generarHoras() {
   sel.innerHTML = '<option value="">Cargando horas…</option>';
   sel.disabled = true;
 
-  let ocupadas = [];
+  let reservadas = [];
   if (fecha) {
     try {
       const snap = await getDocs(
@@ -202,17 +231,22 @@ async function generarHoras() {
           where("estado", "in", ["pendiente", "confirmada"])
         )
       );
-      ocupadas = snap.docs.map(d => d.data().hora).filter(Boolean);
+      reservadas = snap.docs.map(d => ({
+        hora:     d.data().hora,
+        servicio: d.data().servicio
+      }));
     } catch (err) {
       console.warn("Error al cargar horas:", err.message);
     }
   }
 
+  const bloqueadas = calcHorasOcupadas(reservadas);
+
   sel.disabled = false;
   let html = '<option value="">Selecciona una hora</option>';
   for (let h = 9; h <= 18; h++) {
-    const hora = `${String(h).padStart(2, "0")}:00`;
-    const busy = ocupadas.includes(hora);
+    const hora  = `${String(h).padStart(2, "0")}:00`;
+    const busy  = bloqueadas.has(hora);
     html += `<option value="${hora}" ${busy ? "disabled" : ""}>${hora}${busy ? " (ocupado)" : ""}</option>`;
   }
   sel.innerHTML = html;
@@ -224,30 +258,60 @@ document.getElementById("fdate")?.addEventListener("change", generarHoras);
 // FORMULARIO → FIRESTORE + WHATSAPP
 // ════════════════════════════════════════
 async function submitForm() {
-  const btn  = document.getElementById("submitBtn");
+  const btn = document.getElementById("submitBtn");
   if (btn) { btn.disabled = true; btn.textContent = "Enviando..."; }
 
-  const name    = document.getElementById("fname")?.value.trim()   || "";
-  const phone   = document.getElementById("fphone")?.value.trim()  || "";
-  const service = document.getElementById("fservice")?.value       || "";
-  const date    = document.getElementById("fdate")?.value          || "";
-  const hour    = document.getElementById("fhour")?.value          || "";
-  const msg     = document.getElementById("fmsg")?.value.trim()    || "";
+  const name    = document.getElementById("fname")?.value.trim()  || "";
+  const phone   = document.getElementById("fphone")?.value.trim() || "";
+  const service = document.getElementById("fservice")?.value      || "";
+  const date    = document.getElementById("fdate")?.value         || "";
+  const hour    = document.getElementById("fhour")?.value         || "";
+  const msg     = document.getElementById("fmsg")?.value.trim()   || "";
 
   // Limpiar errores anteriores
   document.querySelectorAll(".form-error").forEach(e => e.classList.remove("show"));
 
   let valid = true;
-  if (!name)              { document.getElementById("fname-error").classList.add("show");    valid = false; }
-  if (!phone || phone.length < 6) { document.getElementById("fphone-error").classList.add("show");   valid = false; }
-  if (!service)           { document.getElementById("fservice-error").classList.add("show"); valid = false; }
+  if (!name)                   { document.getElementById("fname-error").classList.add("show");    valid = false; }
+  if (!phone || phone.length < 6) { document.getElementById("fphone-error").classList.add("show"); valid = false; }
+  if (!service)                { document.getElementById("fservice-error").classList.add("show"); valid = false; }
 
   if (!valid) {
     if (btn) { btn.disabled = false; btn.textContent = "Enviar solicitud"; }
     return;
   }
 
-  // Guardar en Firestore
+  // ── Verificar que el horario SIGUE disponible al enviar ──
+  // Protege contra dos clientes que seleccionaron el mismo slot simultáneamente
+  if (date && hour) {
+    try {
+      const snap = await getDocs(
+        query(collection(db, "reservas"), where("fecha", "==", date), where("estado", "in", ["pendiente", "confirmada"]))
+      );
+      const existentes  = snap.docs.map(d => ({ hora: d.data().hora, servicio: d.data().servicio }));
+      const bloqueadas  = calcHorasOcupadas(existentes);
+      if (bloqueadas.has(hour)) {
+        await generarHoras(); // refrescar el selector con las horas reales
+        const ok = document.getElementById("successMsg");
+        if (ok) {
+          ok.textContent = "⚠️ Ese horario acaba de ser reservado. Por favor elige otra hora.";
+          ok.style.cssText = "background:rgba(201,112,126,.12);color:#a85460;";
+          ok.classList.add("show");
+          setTimeout(() => {
+            ok.classList.remove("show");
+            ok.removeAttribute("style");
+            ok.textContent = "✅ ¡Solicitud enviada! Te contactaré pronto para confirmar tu cita.";
+          }, 5000);
+        }
+        if (btn) { btn.disabled = false; btn.textContent = "Enviar solicitud"; }
+        return;
+      }
+    } catch (err) {
+      console.warn("Error al verificar horario:", err.message);
+    }
+  }
+
+  // ── Guardar en Firestore ──────────────────────────────────
   try {
     await addDoc(collection(db, "reservas"), {
       nombre:   name,
@@ -263,22 +327,29 @@ async function submitForm() {
     console.warn("Firestore:", err.message);
   }
 
-  // Abrir WhatsApp
-  const waMsg = `Hola, quiero reservar una cita:\n\n👤 Nombre: ${name}\n📱 Teléfono: ${phone}\n✂️ Servicio: ${service}\n📅 Fecha: ${date || "No especificada"}\n🕐 Hora: ${hour || "No especificada"}\n💬 Mensaje: ${msg || "Ninguno"}`;
-  window.open(`https://wa.me/50765991047?text=${encodeURIComponent(waMsg)}`, "_blank");
+  // ── WhatsApp — botón en el mensaje de éxito ───────────────
+  // Usar un enlace <a> en vez de window.open() para que funcione
+  // en móvil sin ser bloqueado por el navegador
+  const waMsg = `Hola, quiero confirmar mi reserva:\n\n👤 ${name}\n📱 ${phone}\n✂️ ${service}\n📅 ${date || "Sin fecha"}\n🕐 ${hour || "Sin hora"}\n💬 ${msg || "—"}`;
+  const waUrl = `https://wa.me/50765991047?text=${encodeURIComponent(waMsg)}`;
 
-  // Resetear formulario
+  // ── Resetear formulario ───────────────────────────────────
   ["fname", "fphone", "fservice", "fdate", "fhour", "fmsg"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = "";
   });
   generarHoras();
 
-  // Mostrar mensaje de éxito
+  // ── Mensaje de éxito + botón WhatsApp ────────────────────
   const ok = document.getElementById("successMsg");
   if (ok) {
+    ok.innerHTML = `✅ ¡Solicitud enviada!&nbsp;&nbsp;<a href="${waUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;padding:7px 15px;border-radius:100px;text-decoration:none;font-size:13px;font-weight:600;vertical-align:middle;">💬 Confirmar por WhatsApp</a>`;
+    ok.removeAttribute("style");
     ok.classList.add("show");
-    setTimeout(() => ok.classList.remove("show"), 5000);
+    setTimeout(() => {
+      ok.classList.remove("show");
+      ok.textContent = "✅ ¡Solicitud enviada! Te contactaré pronto para confirmar tu cita.";
+    }, 14000);
   }
 
   if (btn) { btn.disabled = false; btn.textContent = "Enviar solicitud"; }
