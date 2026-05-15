@@ -9,18 +9,43 @@ Stack: HTML · CSS · JavaScript Vanilla · Firebase (Auth + Firestore)
 
 ```
 /
-├── index.html          → Sitio principal (clientes)
-├── login.html          → Login para administrador
-├── admin.html          → Panel de gestión de reservas
-├── si.css              → Estilos principales
-├── firebase-config.js  → ⚠️ Configuración Firebase (editar)
-├── app.js              → Lógica del sitio principal
-└── img/                → Fotos para el before/after
+├── index.html                → Sitio principal (clientes)
+├── admin2341.html            → Panel admin (servido en /admin2341)
+├── vercel.json               → Config Vercel: cleanUrls (sin .html)
+├── styles.css                → Estilos principales
+├── admin.css                 → Estilos del panel admin
+├── firebase-config.js        → ⚠️ Configuración Firebase (editar)
+├── app.js                    → Lógica del sitio principal
+├── Admin.js                  → Lógica del panel admin
+├── Calendar.js               → Integración Google Calendar
+└── img/                      → Fotos del before/after
     ├── 1.jpeg
     ├── 2.jpeg
     ├── 3.jpeg
     └── 4.jpeg
 ```
+
+---
+
+## Acceso al panel admin
+
+**No hay login con usuario/contraseña.** El acceso es por **URL "secreta"**:
+
+```
+https://tu-sitio.com/admin2341
+```
+
+(En Vercel, gracias a `cleanUrls: true` en `vercel.json`, el archivo
+`admin2341.html` se sirve sin la extensión `.html`.)
+
+Cualquiera que conozca esta URL tiene acceso total al panel. Si necesitas
+cambiar el slug, renombra el archivo `admin2341.html` y actualiza este
+README. **Esto es seguridad por oscuridad — apropiado solo para proyectos
+académicos o demos, no para producción con datos reales de clientes.**
+
+Al abrir esa URL, el panel inicia una sesión **anónima automática** de
+Firebase. Esto permite que las reglas de Firestore exijan `request.auth != null`
+para bloquear bots y acceso casual a la base de datos vía API.
 
 ---
 
@@ -33,12 +58,14 @@ Stack: HTML · CSS · JavaScript Vanilla · Firebase (Auth + Firestore)
 3. Ponle nombre: `eternal-beauty-studio`
 4. Desactiva Google Analytics (no es necesario aún)
 
-### 2. Activar Authentication
+### 2. Activar Authentication (modo anónimo)
 
 1. En el menú izquierdo → **Authentication** → **Comenzar**
-2. Pestaña **Sign-in method** → Habilitar **Correo/Contraseña**
-3. Ve a **Users** → **Agregar usuario**
-4. Escribe el email y contraseña del admin del salón
+2. Pestaña **Sign-in method** → Habilitar **Anonymous**
+3. (Opcional) Deshabilita los demás métodos si no los necesitas
+
+> No necesitas crear usuarios manualmente. El panel admin se loguea solo
+> de forma anónima al cargar la página.
 
 ### 3. Activar Firestore
 
@@ -54,10 +81,11 @@ En Firestore → pestaña **Reglas**, pega esto:
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Solo usuarios autenticados pueden leer/escribir reservas
     match /reservas/{docId} {
-      allow read, write: if request.auth != null;
-      allow create: if true;  // público puede crear reservas
+      // El público (no autenticado) puede CREAR reservas desde el formulario
+      allow create: if true;
+      // Solo sesiones autenticadas (incluye anónimas) pueden leer / editar / borrar
+      allow read, update, delete: if request.auth != null;
     }
   }
 }
@@ -99,7 +127,7 @@ Cada documento tiene esta estructura:
 | Cancelar reserva  | Cambia estado a "cancelada"                     |
 | Completar reserva | Cambia estado a "completada"                    |
 | Contactar cliente | Abre WhatsApp directo al cliente con el mensaje |
-| Cerrar sesión     | Logout de Firebase Auth                         |
+| Cerrar sesión     | Cierra la sesión anónima y vuelve al sitio      |
 
 ---
 

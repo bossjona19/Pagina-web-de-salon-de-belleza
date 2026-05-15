@@ -5,17 +5,13 @@
 
 import { auth, db } from "./firebase-config.js";
 import {
-  onAuthStateChanged, signOut,
-  GoogleAuthProvider, signInWithPopup,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  collection, addDoc, Timestamp
+  collection, addDoc, getDocs, query, where, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-// ─── CORREO ADMIN AUTORIZADO ──────────────────────────────────
-// ⚠️  Cámbialo por el correo real del admin
-const ADMIN_EMAIL = "admin@eternalbeauty.com";
 
 // ─── DATOS ───────────────────────────────────────────────────
 const SERVICES = [
@@ -61,121 +57,8 @@ const CATEGORIES = [
   { id: "tratamientos", label: "Tratamientos" }
 ];
 
-const BLOCKED_HOURS = {
-  "2026-05-19": ["13:00", "16:00"],
-  "2026-05-20": ["10:00", "15:00"]
-};
 
 let currentFilter = "all";
-
-// ════════════════════════════════════════
-// LOGIN MODAL
-// ════════════════════════════════════════
-
-function isAdmin(email) {
-  return email === ADMIN_EMAIL;
-}
-
-// Abre el modal
-window.openLoginModal = () => {
-  document.getElementById("loginBackdrop").classList.add("open");
-  document.body.style.overflow = "hidden";
-  setTimeout(() => document.getElementById("lmEmail")?.focus(), 350);
-};
-
-// Cierra el modal
-window.closeLoginModal = () => {
-  document.getElementById("loginBackdrop").classList.remove("open");
-  document.body.style.overflow = "";
-  _lmClearError();
-};
-
-// Clic en el fondo cierra el modal
-window.handleBackdropClick = (e) => {
-  if (e.target.id === "loginBackdrop") window.closeLoginModal();
-};
-
-// Mostrar / ocultar contraseña
-window.togglePass = () => {
-  const inp = document.getElementById("lmPassword");
-  inp.type = inp.type === "password" ? "text" : "password";
-};
-
-function _lmShowError(msg) {
-  const el = document.getElementById("lmError");
-  el.textContent = msg;
-  el.classList.add("show");
-}
-function _lmClearError() {
-  document.getElementById("lmError")?.classList.remove("show");
-}
-function _lmSetLoading(on) {
-  const btn = document.getElementById("lmSubmitBtn");
-  btn.disabled = on;
-  btn.classList.toggle("loading", on);
-}
-
-// Login con Google
-window.doGoogleLogin = async () => {
-  _lmClearError();
-  const btn = document.getElementById("lmGoogleBtn");
-  btn.disabled = true;
-  const originalHTML = btn.innerHTML;
-  btn.textContent = "Conectando…";
-  try {
-    const provider = new GoogleAuthProvider();
-    const result   = await signInWithPopup(auth, provider);
-    if (!isAdmin(result.user.email)) {
-      await signOut(auth);
-      _lmShowError(`La cuenta ${result.user.email} no tiene acceso al panel admin.`);
-      btn.disabled = false;
-      btn.innerHTML = originalHTML;
-      return;
-    }
-    window.location.href = "admin.html";
-  } catch {
-    _lmShowError("No se pudo iniciar sesión con Google. Intenta de nuevo.");
-    btn.disabled = false;
-    btn.innerHTML = originalHTML;
-  }
-};
-
-// Login con correo y contraseña
-window.doEmailLogin = async () => {
-  _lmClearError();
-  const email    = document.getElementById("lmEmail").value.trim();
-  const password = document.getElementById("lmPassword").value;
-  if (!email || !password) { _lmShowError("Ingresa correo y contraseña."); return; }
-  if (!isAdmin(email))     { _lmShowError("Este correo no tiene permisos de administrador."); return; }
-
-  _lmSetLoading(true);
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "admin.html";
-  } catch (err) {
-    const msgs = {
-      "auth/user-not-found":     "Usuario no encontrado.",
-      "auth/wrong-password":     "Contraseña incorrecta.",
-      "auth/invalid-email":      "Correo no válido.",
-      "auth/too-many-requests":  "Demasiados intentos. Espera un momento.",
-      "auth/invalid-credential": "Correo o contraseña incorrectos."
-    };
-    _lmShowError(msgs[err.code] || "Error al iniciar sesión. Intenta de nuevo.");
-  } finally {
-    _lmSetLoading(false);
-  }
-};
-
-// ─── Auth guard: si ya está logueado como admin, mostrar link ──
-onAuthStateChanged(auth, user => {
-  const adminLink = document.getElementById("adminLink");
-  if (adminLink) adminLink.style.display = (user && isAdmin(user.email)) ? "inline-block" : "none";
-});
-
-// Teclas del modal
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") window.closeLoginModal?.();
-});
 
 // ════════════════════════════════════════
 // FILTROS DE SERVICIOS
@@ -299,13 +182,33 @@ function populateSelect() {
 }
 
 // ════════════════════════════════════════
-// HORAS DISPONIBLES
+// HORAS DISPONIBLES (desde Firestore)
 // ════════════════════════════════════════
-function generarHoras() {
+async function generarHoras() {
   const sel   = document.getElementById("fhour");
   const fecha = document.getElementById("fdate")?.value || "";
   if (!sel) return;
-  const ocupadas = BLOCKED_HOURS[fecha] || [];
+
+  sel.innerHTML = '<option value="">Cargando horas…</option>';
+  sel.disabled = true;
+
+  let ocupadas = [];
+  if (fecha) {
+    try {
+      const snap = await getDocs(
+        query(
+          collection(db, "reservas"),
+          where("fecha", "==", fecha),
+          where("estado", "in", ["pendiente", "confirmada"])
+        )
+      );
+      ocupadas = snap.docs.map(d => d.data().hora).filter(Boolean);
+    } catch (err) {
+      console.warn("Error al cargar horas:", err.message);
+    }
+  }
+
+  sel.disabled = false;
   let html = '<option value="">Selecciona una hora</option>';
   for (let h = 9; h <= 18; h++) {
     const hora = `${String(h).padStart(2, "0")}:00`;
@@ -400,10 +303,14 @@ function initScrollAnimations() {
 window.toggleMobileNav = function () {
   document.getElementById("mobileNav")?.classList.toggle("open");
   document.getElementById("hamburger")?.classList.toggle("open");
+  document.getElementById("mobileNavOverlay")?.classList.toggle("open");
+  document.body.style.overflow = document.getElementById("mobileNav")?.classList.contains("open") ? "hidden" : "";
 };
 window.closeMobileNav = function () {
   document.getElementById("mobileNav")?.classList.remove("open");
   document.getElementById("hamburger")?.classList.remove("open");
+  document.getElementById("mobileNavOverlay")?.classList.remove("open");
+  document.body.style.overflow = "";
 };
 
 // ════════════════════════════════════════
@@ -465,11 +372,6 @@ function initSlider(containerId, afterWrapId, dividerId, handleId) {
 // INIT
 // ════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", () => {
-  // Inicializar campo de password — Enter para submit
-  document.getElementById("lmPassword")?.addEventListener("keydown", e => {
-    if (e.key === "Enter") window.doEmailLogin();
-  });
-
   renderFilters();
   renderServices();
   generarHoras();
@@ -477,9 +379,92 @@ document.addEventListener("DOMContentLoaded", () => {
   initSlider("ba1", "afterWrap1", "baDivider1", "baHandle1");
   initSlider("ba2", "afterWrap2", "baDivider2", "baHandle2");
 
-  // Botón submit del formulario
   document.getElementById("submitBtn")?.addEventListener("click", submitForm);
 
-  // Lucide icons
   if (window.lucide) lucide.createIcons();
+
+  // ── Login modal ──────────────────────────────────────────
+  const loginModal = document.getElementById("loginModal");
+  if (loginModal) {
+    // Cerrar al hacer clic en el fondo
+    loginModal.addEventListener("click", e => {
+      if (e.target === loginModal) loginModal.classList.remove("open");
+    });
+    // Cerrar con Escape
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") loginModal.classList.remove("open");
+    });
+    // Enter en el campo contraseña
+    document.getElementById("loginPassword")?.addEventListener("keydown", e => {
+      if (e.key === "Enter") handleAdminLogin();
+    });
+  }
 });
+
+// ════════════════════════════════════════
+// LOGIN ADMIN
+// ════════════════════════════════════════
+const AUTH_ERRORS = {
+  "auth/invalid-credential": "Correo o contraseña incorrectos.",
+  "auth/user-not-found":     "No existe una cuenta con ese correo.",
+  "auth/wrong-password":     "Contraseña incorrecta.",
+  "auth/invalid-email":      "El correo no es válido.",
+  "auth/too-many-requests":  "Demasiados intentos. Intenta más tarde.",
+  "auth/popup-closed-by-user": "Cerraste el popup antes de completar el login."
+};
+
+function setLoginLoading(loading, btnId = "loginBtn", text = "Iniciar sesión") {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.textContent = loading ? "Entrando…" : text;
+}
+
+function showLoginError(msg) {
+  const errEl = document.getElementById("loginError");
+  if (!errEl) return;
+  errEl.textContent = msg;
+  errEl.style.display = "block";
+}
+
+function clearLoginError() {
+  const errEl = document.getElementById("loginError");
+  if (errEl) errEl.style.display = "none";
+}
+
+window.toggleLoginPassword = function () {
+  const input = document.getElementById("loginPassword");
+  if (!input) return;
+  input.type = input.type === "password" ? "text" : "password";
+};
+
+window.handleGoogleLogin = async function () {
+  clearLoginError();
+  const btn = document.getElementById("loginGoogleBtn");
+  if (btn) { btn.disabled = true; btn.textContent = "Conectando…"; }
+  try {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+    window.location.href = "admin2341.html";
+  } catch (err) {
+    showLoginError(AUTH_ERRORS[err.code] || "Error al iniciar sesión con Google.");
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" height="20"> Continuar con Google';
+    }
+  }
+};
+
+window.handleAdminLogin = async function () {
+  const email    = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  clearLoginError();
+  setLoginLoading(true);
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.href = "admin2341.html";
+  } catch (err) {
+    showLoginError(AUTH_ERRORS[err.code] || "Error al iniciar sesión.");
+    setLoginLoading(false);
+  }
+};
+

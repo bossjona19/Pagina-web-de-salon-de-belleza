@@ -18,8 +18,8 @@
 // ============================================================
 
 // ── ⚠️ CONFIGURACIÓN — CAMBIA ESTOS VALORES ─────────────────
-const GCAL_CLIENT_ID  = "TU_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
-const GCAL_API_KEY    = "TU_GOOGLE_API_KEY";
+const GCAL_CLIENT_ID  = "680509237149-umdm4820kc4otkkfl17nvcgl1pgkrhrf.apps.googleusercontent.com";
+const GCAL_API_KEY    = "AIzaSyDISg9Le0YppqqanblwmybDSfW6VphA3Ak";
 const GCAL_CALENDAR_ID = "primary"; // "primary" usa el calendario principal del admin
 const GCAL_SCOPES     = "https://www.googleapis.com/auth/calendar.events";
 // ─────────────────────────────────────────────────────────────

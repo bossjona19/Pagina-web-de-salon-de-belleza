@@ -3,8 +3,7 @@
 // Panel administrativo: auth, Firestore, calendario, charts, Excel
 // ============================================================
 
-import { auth } from "./firebase-config.js";
-import { db }   from "./firebase-config.js";
+import { auth, db } from "./firebase-config.js";
 import {
   onAuthStateChanged,
   signOut
@@ -21,8 +20,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { addCalendarEvent, removeCalendarEvent } from "./calendar.js";
 
-// ─── CONFIG ──────────────────────────────────────────────────
-const ADMIN_EMAIL = "admin@eternalbeauty.com"; // ⚠️ cambia al correo real
+// ─── CONFIG — agrega aquí los correos de cada admin ──────────
+const ADMIN_EMAILS = [
+  "quinterojonathan108@gmail.com",
+  // "duena@correo.com",
+  // "asistente@correo.com",
+];
 
 // Precio estimado por servicio (para KPIs)
 const SERVICE_PRICES = {
@@ -115,7 +118,7 @@ onAuthStateChanged(auth, user => {
     window.location.href = "index.html";
     return;
   }
-  if (user.email !== ADMIN_EMAIL) {
+  if (!ADMIN_EMAILS.includes(user.email)) {
     hideLoading();
     document.body.innerHTML = `
       <div class="access-denied">
@@ -126,19 +129,11 @@ onAuthStateChanged(auth, user => {
     return;
   }
 
-  // Update sidebar user info
-  const emailEl = document.getElementById("sidebarEmail");
+  const emailEl  = document.getElementById("sidebarEmail");
   const avatarEl = document.getElementById("sidebarAvatar");
-  if (emailEl) emailEl.textContent = user.email;
-  if (avatarEl) {
-    if (user.photoURL) {
-      avatarEl.innerHTML = `<img src="${user.photoURL}" class="user-av" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" alt="Avatar">`;
-    } else {
-      avatarEl.textContent = user.displayName?.[0]?.toUpperCase() || "A";
-    }
-  }
+  if (emailEl)  emailEl.textContent = user.email;
+  if (avatarEl) avatarEl.textContent = user.displayName?.[0]?.toUpperCase() || "A";
 
-  // Start app
   initRealtimeListener();
   hideLoading();
 });
@@ -146,7 +141,7 @@ onAuthStateChanged(auth, user => {
 // ─── LOGOUT ──────────────────────────────────────────────────
 window.doLogout = async () => {
   await signOut(auth);
-  window.location.href = "index.html";
+  location.href = "index.html";
 };
 
 // ─── REALTIME LISTENER ───────────────────────────────────────

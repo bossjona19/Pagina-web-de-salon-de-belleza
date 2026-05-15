@@ -18,6 +18,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// ⬇️  Estas dos exportaciones son las que usan app.js y admin.html
+// ⬇️  Estas dos exportaciones son las que usan app.js y admin.js
 export const auth = getAuth(app);
 export const db   = getFirestore(app);
