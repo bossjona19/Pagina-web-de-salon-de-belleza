@@ -3,7 +3,8 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /reservas/{docId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null;
+      allow read: if true;
+      allow update, delete: if request.auth != null;
     }
   }
 }
