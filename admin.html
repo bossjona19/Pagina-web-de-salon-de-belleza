@@ -354,7 +354,7 @@ tbody tr:hover td{background:#fdf9f6;}
 }
 .toast.show{transform:translateX(-50%) translateY(0);}
 
-/* ── Mobile ────────────────────────────────────────────── */
+/* ── Mobile menu btn ───────────────────────────────────── */
 .mobile-menu-btn{
   display:none;position:fixed;top:14px;left:14px;z-index:50;
   width:40px;height:40px;background:#fff;border:1px solid var(--border);
@@ -362,28 +362,125 @@ tbody tr:hover td{background:#fdf9f6;}
   box-shadow:0 2px 12px rgba(0,0,0,.08);
 }
 .mobile-menu-btn .ms{font-size:22px;color:var(--ink-mid);}
-#overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:39;
-}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:39;}
 
+/* ── Bottom navigation (mobile only) ──────────────────── */
+.bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;border-top:1px solid var(--border);
+  z-index:35;padding-bottom:env(safe-area-inset-bottom,0px);
+  box-shadow:0 -4px 20px rgba(45,31,31,.06);
+}
+.bn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:9px 4px 7px;background:none;border:none;
+  font-size:10px;color:var(--ink-lt);letter-spacing:.3px;
+  cursor:pointer;font-family:var(--font-sans);transition:color .18s;
+}
+.bn-item .ms{font-size:22px;transition:color .18s;}
+.bn-item.active{color:var(--rose);}
+.bn-item.active .ms{color:var(--rose);}
+
+/* ── Breakpoints ───────────────────────────────────────── */
 @media(max-width:1024px){
   .kpi-grid{grid-template-columns:repeat(2,1fr);}
 }
+
 @media(max-width:768px){
+  /* Sidebar: drawer */
   #sidebar{transform:translateX(-100%);box-shadow:none;}
   #sidebar.open{transform:translateX(0);box-shadow:20px 0 60px rgba(0,0,0,.15);}
-  #main{margin-left:0;}
+  #main{margin-left:0;padding-bottom:68px;}
+  #overlay.open{display:block;}
   .mobile-menu-btn{display:flex;}
-  .admin-header{padding:14px 16px 14px 64px;}
-  .content{padding:16px;}
+
+  /* Header compacto */
+  .admin-header{padding:12px 12px 12px 58px;gap:8px;}
+  .ah-title{font-size:22px;}
+  .ah-date{display:none;}
+  /* Botones: solo ícono */
+  .ah-btn span:not(.ms){display:none;}
+  .ah-btn{padding:8px 10px;}
+
+  /* Content */
+  .content{padding:14px 12px;}
+
+  /* Tabs superiores → reemplazados por bottom nav */
+  .tab-nav{display:none;}
+  .bottom-nav{display:flex;}
+
+  /* Charts */
   .charts-grid{grid-template-columns:1fr;}
   .kpi-grid{grid-template-columns:repeat(2,1fr);}
-  #overlay.open{display:block;}
 }
+
 @media(max-width:480px){
   .kpi-grid{grid-template-columns:1fr;}
-  .tab-nav{gap:0;}
-  .tab-btn{padding:10px 14px;font-size:13px;}
+  .kpi-val{font-size:30px;}
+  .kpi-card{padding:16px;}
+}
+
+/* ── Tabla → Cards en móvil ────────────────────────────── */
+@media(max-width:640px){
+  .table-wrap table thead{display:none;}
+  .table-wrap table,
+  .table-wrap tbody,
+  .table-wrap tr{display:block;width:100%;}
+  .table-wrap tr{
+    background:#fff;border-radius:14px;margin-bottom:10px;
+    padding:14px 16px;border:1px solid var(--border);
+    box-shadow:0 1px 6px rgba(45,31,31,.04);
+  }
+  .table-wrap td{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:5px 0;border:none;font-size:13px;min-height:28px;
+  }
+  .table-wrap td::before{
+    content:attr(data-label);
+    font-size:10px;font-weight:700;color:var(--ink-lt);
+    text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;
+  }
+  /* Fila de acciones: bloque separado */
+  .table-wrap td:last-child{
+    flex-direction:column;align-items:flex-start;
+    padding-top:10px;margin-top:6px;
+    border-top:1px solid var(--border);
+  }
+  .table-wrap td:last-child::before{content:"Acciones";}
+  /* Loading y empty: sin label */
+  .table-wrap td.table-loading,
+  .table-wrap td.empty-state-cell{
+    flex-direction:column;align-items:center;
+    text-align:center;padding:36px 20px;
+  }
+  .table-wrap td.table-loading::before,
+  .table-wrap td.empty-state-cell::before{display:none;}
+}
+
+/* ── Calendario → puntos en móvil ──────────────────────── */
+@media(max-width:600px){
+  #calGrid{gap:1px;}
+  .cal-day{min-height:48px;padding:3px;}
+  .cal-day-header{font-size:9px;padding:6px 0;}
+  .cal-day-num{font-size:11px;margin-bottom:2px;}
+  /* Pills → puntos de color */
+  .cal-event-pill{
+    width:7px;height:7px;border-radius:50%;
+    font-size:0;padding:0;margin:1px auto;display:block;
+  }
+  .cal-more{display:none;}
+}
+
+/* ── Modales → bottom sheet en móvil ───────────────────── */
+@media(max-width:600px){
+  .detail-overlay{padding:0;align-items:flex-end;}
+  .detail-modal{
+    border-radius:20px 20px 0 0;max-height:92vh;
+    animation:slideUp .25s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes slideUp{from{transform:translateY(60px);opacity:0;}to{transform:none;opacity:1;}}
+  .detail-content{padding:16px 18px;}
 }
 
 /* ── Access denied ─────────────────────────────────────── */
@@ -711,6 +808,22 @@ tbody tr:hover td{background:#fdf9f6;}
   </div>
 </div>
 
+<!-- ═══ BOTTOM NAV (móvil) ═══ -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="bn-item active" data-tab="dashboardTab" onclick="switchTab('dashboardTab',this)">
+    <span class="ms">grid_view</span><span>Inicio</span>
+  </button>
+  <button class="bn-item" data-tab="calendarTab" onclick="switchTab('calendarTab',this)">
+    <span class="ms">calendar_month</span><span>Agenda</span>
+  </button>
+  <button class="bn-item" data-tab="reservasTab" onclick="switchTab('reservasTab',this)">
+    <span class="ms">event_note</span><span>Reservas</span>
+  </button>
+  <button class="bn-item" data-tab="statsTab" onclick="switchTab('statsTab',this)">
+    <span class="ms">bar_chart</span><span>Stats</span>
+  </button>
+</nav>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -718,29 +831,22 @@ tbody tr:hover td{background:#fdf9f6;}
 <script>
   /* ── Tab switching ─────────────────────────────────────── */
   function switchTab(tabId, triggerEl) {
+    // Ocultar todos los paneles
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-
-    // Reset top tab buttons
-    document.querySelectorAll('.tab-btn').forEach(b => {
-      b.classList.remove('active');
-    });
-
-    // Reset sidebar links
+    // Limpiar activos: top tabs + bottom nav + sidebar
+    document.querySelectorAll('.tab-btn, .bn-item').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
 
-    // Show panel
+    // Mostrar panel
     document.getElementById(tabId)?.classList.add('active');
 
-    // Activate sidebar link matching tabId
+    // Activar todos los elementos que apuntan a este tab (top tabs + bottom nav)
+    document.querySelectorAll('[data-tab="' + tabId + '"]').forEach(b => b.classList.add('active'));
+
+    // Activar link de sidebar correspondiente
     document.querySelectorAll('.sidebar-nav a').forEach(a => {
       if ((a.getAttribute('onclick') || '').includes("'" + tabId + "'")) a.classList.add('active');
     });
-
-    // Activate tab button matching tabId
-    document.querySelectorAll('.tab-btn[data-tab="' + tabId + '"]').forEach(b => b.classList.add('active'));
-
-    // If the trigger was a sidebar link (no data-tab), it's already handled above
-    // If the trigger was a tab button (has data-tab), it's already handled above
 
     if (window.innerWidth <= 768) closeSidebar();
     if (tabId === 'statsTab')    window._adminCharts?.renderAll();

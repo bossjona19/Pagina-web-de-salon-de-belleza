@@ -239,13 +239,13 @@ function rowHTML(r) {
   const price = getPrice(r.servicio);
   return `
     <tr>
-      <td class="td-name">${r.nombre || "—"}</td>
-      <td class="td-service">${r.servicio || "—"}</td>
-      <td>${formatDate(r.fecha)}</td>
-      <td>${r.hora || "—"}</td>
-      <td>${badgeHTML(r.estado || "pendiente")}</td>
-      <td class="td-price">${price ? `$${price}` : "—"}</td>
-      <td>${actionBtns(r.id, r.estado, r.telefono, r.nombre, r.servicio)}</td>
+      <td class="td-name"   data-label="Cliente">${r.nombre || "—"}</td>
+      <td class="td-service" data-label="Servicio">${r.servicio || "—"}</td>
+      <td data-label="Fecha">${formatDate(r.fecha)}</td>
+      <td data-label="Hora">${r.hora || "—"}</td>
+      <td data-label="Estado">${badgeHTML(r.estado || "pendiente")}</td>
+      <td class="td-price"  data-label="Precio">${price ? `$${price}` : "—"}</td>
+      <td data-label="Acciones">${actionBtns(r.id, r.estado, r.telefono, r.nombre, r.servicio)}</td>
     </tr>`;
 }
 
