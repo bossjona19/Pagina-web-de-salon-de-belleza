@@ -58,7 +58,8 @@ const CATEGORIES = [
 ];
 
 
-let currentFilter = "all";
+let currentFilter  = "all";
+let horasBloqueadas = new Set();
 
 // ════════════════════════════════════════
 // FILTROS DE SERVICIOS
@@ -240,14 +241,14 @@ async function generarHoras() {
     }
   }
 
-  const bloqueadas = calcHorasOcupadas(reservadas);
+  horasBloqueadas = calcHorasOcupadas(reservadas);
 
   sel.disabled = false;
   let html = '<option value="">Selecciona una hora</option>';
   for (let h = 9; h <= 18; h++) {
-    const hora  = `${String(h).padStart(2, "0")}:00`;
-    const busy  = bloqueadas.has(hora);
-    html += `<option value="${hora}" ${busy ? "disabled" : ""}>${hora}${busy ? " (ocupado)" : ""}</option>`;
+    const hora = `${String(h).padStart(2, "0")}:00`;
+    const busy = horasBloqueadas.has(hora);
+    html += `<option value="${hora}" ${busy ? "disabled" : ""}>${hora}${busy ? " — Hora ocupada" : ""}</option>`;
   }
   sel.innerHTML = html;
 }
@@ -451,6 +452,18 @@ document.addEventListener("DOMContentLoaded", () => {
   initSlider("ba2", "afterWrap2", "baDivider2", "baHandle2");
 
   document.getElementById("submitBtn")?.addEventListener("click", submitForm);
+
+  document.getElementById("fhour")?.addEventListener("change", e => {
+    const errEl = document.getElementById("fhour-error");
+    if (!errEl) return;
+    if (horasBloqueadas.has(e.target.value)) {
+      e.target.value = "";
+      errEl.classList.add("show");
+      setTimeout(() => errEl.classList.remove("show"), 3000);
+    } else {
+      errEl.classList.remove("show");
+    }
+  });
 
   if (window.lucide) lucide.createIcons();
 
