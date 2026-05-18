@@ -254,7 +254,9 @@ async function generarHoras() {
   sel.innerHTML = html;
 }
 
+// iOS Safari a veces dispara "input" en lugar de "change" en date pickers nativos
 document.getElementById("fdate")?.addEventListener("change", generarHoras);
+document.getElementById("fdate")?.addEventListener("input",  generarHoras);
 
 // ════════════════════════════════════════
 // FORMULARIO → FIRESTORE + WHATSAPP
