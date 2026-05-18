@@ -283,6 +283,20 @@ async function submitForm() {
     return;
   }
 
+  // ── Bloqueo local: iOS ignora disabled en el selector nativo ──
+  if (hour && horasBloqueadas.has(hour)) {
+    const ok = document.getElementById("successMsg");
+    if (ok) {
+      ok.textContent = "⚠️ Hora ocupada. Por favor selecciona otra hora.";
+      ok.style.cssText = "background:rgba(201,112,126,.12);color:#a85460;";
+      ok.classList.add("show");
+      setTimeout(() => { ok.classList.remove("show"); ok.removeAttribute("style"); }, 4000);
+    }
+    document.getElementById("fhour").value = "";
+    if (btn) { btn.disabled = false; btn.textContent = "Enviar solicitud"; }
+    return;
+  }
+
   // ── Verificar que el horario SIGUE disponible al enviar ──
   // Protege contra dos clientes que seleccionaron el mismo slot simultáneamente
   if (date && hour) {
