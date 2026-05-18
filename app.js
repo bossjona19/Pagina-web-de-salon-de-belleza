@@ -7,6 +7,7 @@ import { auth, db } from "./firebase-config.js";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInAnonymously,
   GoogleAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
@@ -295,13 +296,13 @@ async function submitForm() {
         await generarHoras(); // refrescar el selector con las horas reales
         const ok = document.getElementById("successMsg");
         if (ok) {
-          ok.textContent = "⚠️ Ese horario acaba de ser reservado. Por favor elige otra hora.";
+          ok.textContent = "Ese horario acaba de ser reservado. Por favor elige otra hora.";
           ok.style.cssText = "background:rgba(201,112,126,.12);color:#a85460;";
           ok.classList.add("show");
           setTimeout(() => {
             ok.classList.remove("show");
             ok.removeAttribute("style");
-            ok.textContent = "✅ ¡Solicitud enviada! Te contactaré pronto para confirmar tu cita.";
+            ok.textContent = "¡Solicitud enviada! Te contactaré pronto para confirmar tu cita.";
           }, 5000);
         }
         if (btn) { btn.disabled = false; btn.textContent = "Enviar solicitud"; }
@@ -444,6 +445,9 @@ function initSlider(containerId, afterWrapId, dividerId, handleId) {
 // INIT
 // ════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", () => {
+  // Sesión anónima para poder leer reservas desde Firestore (verificar disponibilidad)
+  signInAnonymously(auth).catch(() => {});
+
   renderFilters();
   renderServices();
   generarHoras();
