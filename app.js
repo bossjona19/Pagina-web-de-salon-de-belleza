@@ -7,7 +7,6 @@ import { auth, db } from "./firebase-config.js";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
-  signInAnonymously,
   GoogleAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
@@ -254,9 +253,15 @@ async function generarHoras() {
   sel.innerHTML = html;
 }
 
-// iOS Safari a veces dispara "input" en lugar de "change" en date pickers nativos
-document.getElementById("fdate")?.addEventListener("change", generarHoras);
-document.getElementById("fdate")?.addEventListener("input",  generarHoras);
+// iOS Safari a veces dispara "input" en lugar de "change" en date pickers nativos.
+// El debounce evita que ambos eventos lancen dos consultas simultáneas a Firestore.
+let _fechaDebounce = null;
+function onFechaChange() {
+  clearTimeout(_fechaDebounce);
+  _fechaDebounce = setTimeout(generarHoras, 60);
+}
+document.getElementById("fdate")?.addEventListener("change", onFechaChange);
+document.getElementById("fdate")?.addEventListener("input",  onFechaChange);
 
 // ════════════════════════════════════════
 // FORMULARIO → FIRESTORE + WHATSAPP
@@ -343,6 +348,15 @@ async function submitForm() {
     });
   } catch (err) {
     console.warn("Firestore:", err.message);
+    const ok = document.getElementById("successMsg");
+    if (ok) {
+      ok.textContent = "⚠️ Error al guardar la reserva. Revisa tu conexión e intenta de nuevo.";
+      ok.style.cssText = "background:rgba(201,112,126,.12);color:#a85460;";
+      ok.classList.add("show");
+      setTimeout(() => { ok.classList.remove("show"); ok.removeAttribute("style"); }, 5000);
+    }
+    if (btn) { btn.disabled = false; btn.textContent = "Enviar solicitud"; }
+    return;
   }
 
   // ── WhatsApp — botón en el mensaje de éxito ───────────────
@@ -461,9 +475,6 @@ function initSlider(containerId, afterWrapId, dividerId, handleId) {
 // INIT
 // ════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", () => {
-  // Sesión anónima para poder leer reservas desde Firestore (verificar disponibilidad)
-  signInAnonymously(auth).catch(() => {});
-
   renderFilters();
   renderServices();
   generarHoras();
