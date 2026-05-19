@@ -7,6 +7,7 @@ import { auth, db } from "./firebase-config.js";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInAnonymously,
   GoogleAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
@@ -490,6 +491,10 @@ function initSlider(containerId, afterWrapId, dividerId, handleId) {
 // INIT
 // ════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", () => {
+  // Sesión anónima para que cualquier visitante pueda leer reservas de Firestore
+  // y ver las horas ocupadas — sin necesidad de estar registrado.
+  signInAnonymously(auth).catch(err => console.warn("Anon auth:", err.message));
+
   renderFilters();
   renderServices();
   initScrollAnimations();

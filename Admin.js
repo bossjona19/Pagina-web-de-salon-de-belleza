@@ -114,7 +114,7 @@ function actionBtns(id, estado, telefono, nombre, servicio) {
 // ─── AUTH GUARD ───────────────────────────────────────────────
 onAuthStateChanged(auth, user => {
   window._cancelAuthTimer?.(); // cancela el timeout de seguridad
-  if (!user) {
+  if (!user || user.isAnonymous) {
     hideLoading();
     window.location.href = "index.html";
     return;
