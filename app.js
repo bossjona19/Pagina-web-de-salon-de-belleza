@@ -211,57 +211,71 @@ function calcHorasOcupadas(reservaciones) {
   return bloqueadas;
 }
 
+let fpInstance = null; // instancia de Flatpickr
+
 // ════════════════════════════════════════
 // HORAS DISPONIBLES (desde Firestore)
+// Usa <button disabled> en vez de <option disabled>:
+// respetado en iOS, Android y PC sin excepción.
 // ════════════════════════════════════════
 async function generarHoras() {
-  const sel   = document.getElementById("fhour");
-  const fecha = document.getElementById("fdate")?.value || "";
-  if (!sel) return;
+  const grid   = document.getElementById("hourGrid");
+  const hidden = document.getElementById("fhour");
+  const fecha  = document.getElementById("fdate")?.value || "";
+  if (!grid) return;
 
-  sel.innerHTML = '<option value="">Cargando horas…</option>';
-  sel.disabled = true;
+  if (!fecha) {
+    grid.innerHTML = '<p class="hour-grid-hint">Selecciona una fecha primero</p>';
+    if (hidden) hidden.value = "";
+    horasBloqueadas = new Set();
+    return;
+  }
+
+  grid.innerHTML = '<p class="hour-grid-hint">Cargando disponibilidad…</p>';
+  if (hidden) hidden.value = "";
 
   let reservadas = [];
-  if (fecha) {
-    try {
-      const snap = await getDocs(
-        query(
-          collection(db, "reservas"),
-          where("fecha", "==", fecha),
-          where("estado", "in", ["pendiente", "confirmada"])
-        )
-      );
-      reservadas = snap.docs.map(d => ({
-        hora:     d.data().hora,
-        servicio: d.data().servicio
-      }));
-    } catch (err) {
-      console.warn("Error al cargar horas:", err.message);
-    }
+  try {
+    const snap = await getDocs(
+      query(
+        collection(db, "reservas"),
+        where("fecha", "==", fecha),
+        where("estado", "in", ["pendiente", "confirmada"])
+      )
+    );
+    reservadas = snap.docs.map(d => ({
+      hora:     d.data().hora,
+      servicio: d.data().servicio
+    }));
+  } catch (err) {
+    console.warn("Error al cargar horas:", err.message);
   }
 
   horasBloqueadas = calcHorasOcupadas(reservadas);
 
-  sel.disabled = false;
-  let html = '<option value="">Selecciona una hora</option>';
-  for (let h = 9; h <= 18; h++) {
-    const hora = `${String(h).padStart(2, "0")}:00`;
-    const busy = horasBloqueadas.has(hora);
-    html += `<option value="${hora}" ${busy ? "disabled" : ""}>${hora}${busy ? " — Hora ocupada" : ""}</option>`;
-  }
-  sel.innerHTML = html;
-}
+  const horas = [];
+  for (let h = 9; h <= 18; h++) horas.push(`${String(h).padStart(2,"0")}:00`);
 
-// iOS Safari a veces dispara "input" en lugar de "change" en date pickers nativos.
-// El debounce evita que ambos eventos lancen dos consultas simultáneas a Firestore.
-let _fechaDebounce = null;
-function onFechaChange() {
-  clearTimeout(_fechaDebounce);
-  _fechaDebounce = setTimeout(generarHoras, 60);
+  grid.innerHTML = horas.map(hora => {
+    const busy = horasBloqueadas.has(hora);
+    return `<button type="button"
+      class="hour-btn${busy ? "" : ""}"
+      ${busy ? "disabled" : ""}
+      data-hora="${hora}"
+      aria-label="${hora}${busy ? " — Ocupada" : ""}">
+      ${hora}${busy ? `<span class="hour-btn-busy-tag">Ocupada</span>` : ""}
+    </button>`;
+  }).join("");
+
+  grid.querySelectorAll(".hour-btn:not(:disabled)").forEach(btn => {
+    btn.addEventListener("click", () => {
+      grid.querySelectorAll(".hour-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      if (hidden) hidden.value = btn.dataset.hora;
+      document.getElementById("fhour-error")?.classList.remove("show");
+    });
+  });
 }
-document.getElementById("fdate")?.addEventListener("change", onFechaChange);
-document.getElementById("fdate")?.addEventListener("input",  onFechaChange);
 
 // ════════════════════════════════════════
 // FORMULARIO → FIRESTORE + WHATSAPP
@@ -366,11 +380,12 @@ async function submitForm() {
   const waUrl = `https://wa.me/50765991047?text=${encodeURIComponent(waMsg)}`;
 
   // ── Resetear formulario ───────────────────────────────────
-  ["fname", "fphone", "fservice", "fdate", "fhour", "fmsg"].forEach(id => {
+  ["fname", "fphone", "fservice", "fmsg"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = "";
   });
-  generarHoras();
+  document.getElementById("fhour").value = "";
+  if (fpInstance) fpInstance.clear(); // limpia fecha y dispara onChange → generarHoras()
 
   // ── Mensaje de éxito + botón WhatsApp ────────────────────
   const ok = document.getElementById("successMsg");
@@ -477,8 +492,18 @@ function initSlider(containerId, afterWrapId, dividerId, handleId) {
 document.addEventListener("DOMContentLoaded", () => {
   renderFilters();
   renderServices();
-  generarHoras();
   initScrollAnimations();
+
+  // Flatpickr reemplaza input[type=date] nativo.
+  // disableMobile:true fuerza el calendario custom en iOS y Android.
+  fpInstance = flatpickr("#fdate", {
+    dateFormat:    "Y-m-d",
+    minDate:       "today",
+    disableMobile: true,
+    locale:        "es",
+    disable:       [date => date.getDay() === 0], // cierra domingos
+    onChange:      () => generarHoras()
+  });
   initSlider("ba1", "afterWrap1", "baDivider1", "baHandle1");
   initSlider("ba2", "afterWrap2", "baDivider2", "baHandle2");
 
