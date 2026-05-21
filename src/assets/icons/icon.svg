@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="115" fill="#ed6887"/>
+  <text
+    x="256" y="330"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="210"
+    font-weight="400"
+    letter-spacing="-8"
+    fill="white"
+    text-anchor="middle"
+    dominant-baseline="auto">EB</text>
+</svg>

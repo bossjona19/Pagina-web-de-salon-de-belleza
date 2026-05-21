@@ -1,21 +1,37 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- ── CRITICAL META ─────────────────────────────────── -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Eternal Beauty Studio — Maquillaje profesional, faciales y tratamientos de belleza en Panamá. Reserva tu cita hoy.">
-<title>Eternal Beauty Studio | Panamá</title>
 
-<!-- Fonts -->
+<!-- ── SEO ──────────────────────────────────────────── -->
+<title>Eternal Beauty Studio | Panamá</title>
+<meta name="description" content="Eternal Beauty Studio — Maquillaje profesional, faciales y tratamientos de belleza en Panamá. Reserva tu cita hoy.">
+
+<!-- ── FAVICON ───────────────────────────────────────── -->
+<link rel="icon" type="image/png" href="/favicon/favicon-96x96.png?v=1" sizes="96x96">
+<link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg?v=1">
+<link rel="shortcut icon" href="/favicon/favicon.ico?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png?v=1">
+
+<!-- ── PWA ───────────────────────────────────────────── -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ed6887">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="EternalBeauty">
+
+<!-- ── FONTS (preconnect primero para reducir latencia) ─ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 
-<!-- Lucide Icons -->
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<!-- ── LUCIDE (defer: no bloquea render) ─────────────── -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 
-<!-- Flatpickr — date picker cross-device (reemplaza input[type=date] nativo) -->
+<!-- ── ESTILOS ───────────────────────────────────────── -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
-<!-- Estilos -->
 <link rel="stylesheet" href="./src/css/styles.css">
 </head>
 <body>
@@ -324,7 +340,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 
 <!-- ════════ SCRIPTS ════════ -->
-<script type="module" src="./src/js/app.js?v=5"></script>
+<script src="./src/js/sw-register.js" defer></script>
+<script type="module" src="./src/js/app.js"></script>
 
 <!-- Lucide + Chatbot (no necesitan Firebase, van normales) -->
 <script>
