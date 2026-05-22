@@ -50,9 +50,19 @@
     <li><a href="#galeria">Galería</a></li>
     <li><a href="#contacto">Contacto</a></li>
   </ul>
-  <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Abrir menú">
-    <span></span><span></span><span></span>
-  </button>
+  <div class="nav-actions">
+    <button id="installBtn" class="install-btn" aria-label="Instalar app">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Instalar App
+    </button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </nav>
 
 <!-- ════════ MOBILE NAV ════════ -->
@@ -64,6 +74,9 @@
   <a href="#contacto"  onclick="closeMobileNav()">Contacto</a>
   <button class="mobile-admin-link" onclick="closeMobileNav(); document.getElementById('loginModal').classList.add('open')">
     🔐 Admin
+  </button>
+  <button id="installBtnMobile" class="mobile-install-btn" aria-label="Instalar app">
+    Instalar App
   </button>
 </div>
 <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
@@ -179,7 +192,13 @@
           <div class="contact-item-info"><h4>WhatsApp</h4><p>+507 6599-1047</p></div>
         </div>
         <div class="contact-item" role="listitem">
-          <div class="contact-item-icon"><i data-lucide="instagram" class="icon-md"></i></div>
+          <div class="contact-item-icon">
+            <svg class="icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <circle cx="12" cy="12" r="4.5"/>
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
           <div class="contact-item-info"><h4>Instagram</h4><p>@eternalbeauty.pty</p></div>
         </div>
       </div>
@@ -333,6 +352,18 @@
 <div class="chatbot-bubble" id="chatbotBubble">
   ¡Hola! 👋 Soy tu asistente.<br>
   <strong>¿En qué puedo ayudarte hoy?</strong>
+</div>
+
+<!-- ════════ UPDATE TOAST ════════ -->
+<div id="updateToast" class="update-toast" role="status" aria-live="polite" aria-atomic="true">
+  <div class="update-toast-body">
+    <span class="update-toast-icon" aria-hidden="true">✦</span>
+    <div>
+      <p class="update-toast-title">Nueva versión disponible</p>
+      <p class="update-toast-sub">Actualiza para ver las últimas mejoras</p>
+    </div>
+  </div>
+  <button id="updateToastBtn" class="update-toast-btn">Actualizar</button>
 </div>
 
 <!-- Flatpickr JS + locale español -->

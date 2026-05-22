@@ -5,7 +5,7 @@ import { auth } from "./firebase-config.js";
 import { signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { renderFilters, renderServices } from "./services.js";
 import { generarHoras, setFpInstance, initReservaListeners } from "./reservas.js";
-import { initScrollAnimations, initSlider, initLoginModal } from "./ui.js";
+import { initScrollAnimations, initSlider, initLoginModal, initInstallButton } from "./ui.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Sesión anónima para que cualquier visitante pueda leer reservas de Firestore
@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initSlider("ba2", "afterWrap2", "baDivider2", "baHandle2");
   initReservaListeners();
   initLoginModal();
+  initInstallButton();
 
   if (window.lucide) lucide.createIcons();
 });

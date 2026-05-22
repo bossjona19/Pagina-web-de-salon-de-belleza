@@ -159,3 +159,52 @@ export function initLoginModal() {
     if (e.key === "Enter") window.handleAdminLogin();
   });
 }
+
+// ── BOTÓN INSTALAR PWA ───────────────────────────────────────
+export function initInstallButton() {
+  // Si ya está instalada como app standalone, no mostrar nada
+  if (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true
+  ) return;
+
+  let deferredPrompt = null;
+  const desktopBtn = document.getElementById("installBtn");
+  const mobileBtn  = document.getElementById("installBtnMobile");
+
+  function show() {
+    desktopBtn?.classList.add("visible");
+    mobileBtn?.classList.add("visible");
+  }
+
+  function hide() {
+    desktopBtn?.classList.remove("visible");
+    mobileBtn?.classList.remove("visible");
+    deferredPrompt = null;
+  }
+
+  async function triggerInstall() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") hide();
+    deferredPrompt = null;
+  }
+
+  // El browser dispara esto cuando la app es instalable
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    show();
+  });
+
+  // Se dispara cuando el usuario instala desde el prompt del browser
+  window.addEventListener("appinstalled", hide);
+
+  desktopBtn?.addEventListener("click", triggerInstall);
+
+  mobileBtn?.addEventListener("click", () => {
+    window.closeMobileNav?.();
+    triggerInstall();
+  });
+}

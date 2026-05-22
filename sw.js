@@ -1,6 +1,6 @@
 // sw.js - Service Worker - Eternal Beauty Studio
 
-const CACHE_SHELL = "ebs-shell-v3";
+const CACHE_SHELL = "ebs-shell-v4";
 const CACHE_CDN = "ebs-cdn-v1";
 
 // Archivos principales de la app
@@ -37,10 +37,17 @@ const SHELL = [
 // =========================
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_SHELL)
-      .then((cache) => cache.addAll(SHELL))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_SHELL).then((cache) => cache.addAll(SHELL))
   );
+  // No skipWaiting aquí: el nuevo SW espera hasta que el usuario
+  // apruebe la actualización desde el toast (SKIP_WAITING message).
+});
+
+// El toast de actualización envía este mensaje para activar el nuevo SW.
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 // =========================
