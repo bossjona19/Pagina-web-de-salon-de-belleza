@@ -1,6 +1,6 @@
 // sw.js - Service Worker - Eternal Beauty Studio
 
-const CACHE_SHELL = "ebs-shell-v2";
+const CACHE_SHELL = "ebs-shell-v3";
 const CACHE_CDN = "ebs-cdn-v1";
 
 // Archivos principales de la app
@@ -21,6 +21,7 @@ const SHELL = [
   "/src/assets/img/2.jpeg",
   "/src/assets/img/3.jpeg",
   "/src/assets/img/4.jpeg",
+  "/src/assets/img/5.jpeg",
 
   "/src/assets/icons/icon.svg",
 
@@ -125,11 +126,10 @@ self.addEventListener("fetch", (event) => {
 
       fetch(request)
         .then((response) => {
-
+          const clone = response.clone();
           caches.open(CACHE_SHELL).then((cache) => {
-            cache.put(request, response.clone());
+            cache.put(request, clone);
           });
-
           return response;
         })
         .catch(() => {
@@ -165,8 +165,9 @@ self.addEventListener("fetch", (event) => {
           return networkResponse;
         }
 
+        const clone = networkResponse.clone();
         caches.open(CACHE_SHELL).then((cache) => {
-          cache.put(request, networkResponse.clone());
+          cache.put(request, clone);
         });
 
         return networkResponse;
