@@ -162,13 +162,11 @@ export function initLoginModal() {
 
 // ── BOTÓN INSTALAR PWA ───────────────────────────────────────
 export function initInstallButton() {
-  // Si ya está instalada como app standalone, no mostrar nada
   if (
     window.matchMedia("(display-mode: standalone)").matches ||
     window.navigator.standalone === true
   ) return;
 
-  let deferredPrompt = null;
   const desktopBtn = document.getElementById("installBtn");
   const mobileBtn  = document.getElementById("installBtnMobile");
 
@@ -180,26 +178,43 @@ export function initInstallButton() {
   function hide() {
     desktopBtn?.classList.remove("visible");
     mobileBtn?.classList.remove("visible");
-    deferredPrompt = null;
+    window.__pwaInstallPrompt = null;
   }
 
-  async function triggerInstall() {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") hide();
-    deferredPrompt = null;
-  }
+  // beforeinstallprompt puede haber llegado antes de DOMContentLoaded
+  // (capturado por el script inline del <head>)
+  if (window.__pwaInstallPrompt) show();
 
-  // El browser dispara esto cuando la app es instalable
+  // También escuchar eventos futuros (visitas posteriores, tras update del SW)
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
-    deferredPrompt = e;
+    window.__pwaInstallPrompt = e;
     show();
   });
 
-  // Se dispara cuando el usuario instala desde el prompt del browser
   window.addEventListener("appinstalled", hide);
+
+  async function triggerInstall() {
+    const prompt = window.__pwaInstallPrompt;
+    if (!prompt) return;
+
+    // Consumir inmediatamente para evitar doble clic
+    window.__pwaInstallPrompt = null;
+    if (desktopBtn) desktopBtn.disabled = true;
+    if (mobileBtn)  mobileBtn.disabled  = true;
+
+    try {
+      prompt.prompt(); // debe ser síncrono — dentro del gesto del usuario
+      const { outcome } = await prompt.userChoice;
+      // El evento ya fue consumido: ocultar siempre tras la elección
+      hide();
+    } catch (err) {
+      console.warn("PWA install:", err);
+    } finally {
+      if (desktopBtn) desktopBtn.disabled = false;
+      if (mobileBtn)  mobileBtn.disabled  = false;
+    }
+  }
 
   desktopBtn?.addEventListener("click", triggerInstall);
 

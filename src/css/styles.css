@@ -155,22 +155,22 @@ button { font-family: var(--font-sans); }
   display: none; /* oculto por defecto — JS lo muestra */
   align-items: center;
   gap: 6px;
-  padding: 7px 16px;
-  border: 1px solid var(--rose);
-  border-radius: var(--radius-full);
-  background: transparent;
-  color: var(--rose);
+  padding: 14px 30px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--rose);
+  color: var(--white);
   font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 1.2px;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.3s ease, transform 0.3s ease;
 }
 .install-btn.visible { display: flex; }
-.install-btn:hover   { background: var(--rose); color: var(--white); }
+.install-btn:hover   { background: var(--rose-dark); transform: translateY(-1px); }
 
 @media (max-width: 768px) {
   .install-btn { display: none !important; } /* En móvil va en el menú */
@@ -197,7 +197,11 @@ button { font-family: var(--font-sans); }
 .mobile-install-btn.visible { display: block; }
 .mobile-install-btn:hover   { background: var(--rose); color: var(--white); }
 
-/* ── UPDATE TOAST ── */
+/* ── UPDATE TOAST (oculto temporalmente — descomentar cuando esté listo) ── */
+/* TODO: quitar esta línea para activar el toast de actualizaciones */
+.update-toast { display: none !important; }
+
+/* ── UPDATE TOAST base styles ── */
 .update-toast {
   position: fixed;
   bottom: -140px; /* off-screen por defecto */
