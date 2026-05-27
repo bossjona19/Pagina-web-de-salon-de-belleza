@@ -162,99 +162,53 @@ export function initLoginModal() {
 
 // ── BOTÓN INSTALAR PWA ───────────────────────────────────────
 export function initInstallButton() {
-  // Ya está instalada como app — no hacer nada
   if (
     window.matchMedia("(display-mode: standalone)").matches ||
     window.navigator.standalone === true
   ) return;
 
+  // iOS Safari: sin soporte nativo — no mostrar nada
   const ua = navigator.userAgent;
-
-  // iOS: iPhone, iPad (incluyendo iPadOS 13+ que reporta MacIntel con touchpoints)
   const isIOS = /iphone|ipad|ipod/i.test(ua) ||
                 (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-  // Safari puro: excluye Chrome iOS, Firefox iOS, Edge iOS
   const isSafari = /safari/i.test(ua) && !/chrome|crios|fxios|edgios|gsa/i.test(ua);
+  if (isIOS && isSafari) return;
 
-  if (isIOS && isSafari) {
-    _initIOSInstall();
-  } else {
-    _initAndroidInstall();
-  }
-}
+  const btn = document.getElementById("installBtn");
+  if (!btn) return;
 
-// ── Helpers compartidos ──────────────────────────────────────
-function _showInstallBtns() {
-  document.getElementById("installBtn")?.classList.add("visible");
-  document.getElementById("installBtnMobile")?.classList.add("visible");
-}
-function _hideInstallBtns() {
-  document.getElementById("installBtn")?.classList.remove("visible");
-  document.getElementById("installBtnMobile")?.classList.remove("visible");
-  window.__pwaInstallPrompt = null;
-}
-
-// ── FLUJO ANDROID / CHROME ───────────────────────────────────
-function _initAndroidInstall() {
-  // El evento puede haber llegado antes de DOMContentLoaded (script inline en <head>)
   if (window.__pwaInstallPrompt) {
-    console.log("[PWA] beforeinstallprompt capturado temprano — mostrando botón");
-    _showInstallBtns();
+    console.log("[PWA] beforeinstallprompt capturado temprano");
+    btn.classList.add("visible");
   }
 
   window.addEventListener("beforeinstallprompt", (e) => {
-    console.log("[PWA] beforeinstallprompt disparado en Android/Chrome");
+    console.log("[PWA] beforeinstallprompt disparado");
     e.preventDefault();
     window.__pwaInstallPrompt = e;
-    _showInstallBtns();
+    btn.classList.add("visible");
   });
 
   window.addEventListener("appinstalled", () => {
-    console.log("[PWA] App instalada exitosamente");
-    _hideInstallBtns();
+    console.log("[PWA] App instalada");
+    btn.classList.remove("visible");
+    window.__pwaInstallPrompt = null;
   });
 
-  async function triggerInstall() {
+  btn.addEventListener("click", async () => {
     const prompt = window.__pwaInstallPrompt;
     if (!prompt) return;
-
-    window.__pwaInstallPrompt = null; // consumir antes de ir async
-
-    const db = document.getElementById("installBtn");
-    const mb = document.getElementById("installBtnMobile");
-    if (db) db.disabled = true;
-    if (mb) mb.disabled = true;
-
+    window.__pwaInstallPrompt = null;
+    btn.disabled = true;
     try {
-      prompt.prompt(); // DEBE ser síncrono dentro del gesto del usuario
+      prompt.prompt();
       const { outcome } = await prompt.userChoice;
       console.log("[PWA] Elección del usuario:", outcome);
-      _hideInstallBtns();
+      btn.classList.remove("visible");
     } catch (err) {
       console.warn("[PWA] Error al instalar:", err);
     } finally {
-      if (db) db.disabled = false;
-      if (mb) mb.disabled = false;
+      btn.disabled = false;
     }
-  }
-
-  document.getElementById("installBtn")?.addEventListener("click", triggerInstall);
-  document.getElementById("installBtnMobile")?.addEventListener("click", triggerInstall);
-}
-
-// ── FLUJO iOS / SAFARI ───────────────────────────────────────
-function _initIOSInstall() {
-  console.log("[PWA] iOS Safari detectado — mostrando botón de instalación");
-  _showInstallBtns();
-
-  function showHint() {
-    const toast = document.getElementById("iosHint");
-    if (!toast) return;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 3500);
-  }
-
-  document.getElementById("installBtn")?.addEventListener("click", showHint);
-  document.getElementById("installBtnMobile")?.addEventListener("click", showHint);
+  });
 }
