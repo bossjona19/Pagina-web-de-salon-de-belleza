@@ -176,30 +176,20 @@ button { font-family: var(--font-sans); }
   .install-btn { display: none !important; } /* En móvil va en el menú */
 }
 
-/* ── INSTALL BUTTON (móvil — pill flotante en la parte inferior) ── */
+/* ── INSTALL BUTTON (móvil — icono circular junto al hamburger) ── */
 .mobile-install-btn {
   display: none; /* oculto hasta que beforeinstallprompt dispare */
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 200; /* por encima del nav (100) pero debajo del overlay del menú (299) */
+  width: 36px;
+  height: 36px;
   align-items: center;
-  gap: 8px;
-  padding: 14px 28px;
+  justify-content: center;
   background: var(--rose);
   color: var(--white);
   border: none;
-  border-radius: var(--radius-full);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  border-radius: 50%;
   cursor: pointer;
-  white-space: nowrap;
-  box-shadow: 0 8px 32px rgba(237, 104, 135, 0.45);
-  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  flex-shrink: 0;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 .mobile-install-btn.visible {
   display: flex;
@@ -207,12 +197,11 @@ button { font-family: var(--font-sans); }
 .mobile-install-btn:hover,
 .mobile-install-btn:active {
   background: var(--rose-dark);
-  transform: translateX(-50%) translateY(-2px);
-  box-shadow: 0 12px 40px rgba(237, 104, 135, 0.55);
+  transform: scale(1.1);
 }
 
 @media (min-width: 769px) {
-  .mobile-install-btn { display: none !important; } /* en desktop va en la navbar */
+  .mobile-install-btn { display: none !important; } /* en desktop usa .install-btn */
 }
 
 /* ── UPDATE TOAST (oculto temporalmente — descomentar cuando esté listo) ── */
