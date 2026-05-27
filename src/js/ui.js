@@ -26,23 +26,6 @@ window.closeMobileNav = function () {
   document.body.style.overflow = "";
 };
 
-// ── GALERÍA SCROLL ──────────────────────────────────────────
-window.scrollGallery = function (dir) {
-  const c = document.getElementById("gallery");
-  if (!c) return;
-  const max = c.scrollWidth - c.clientWidth;
-  if      (dir ===  1 && c.scrollLeft >= max - 10) c.scrollTo({ left: 0,   behavior: "smooth" });
-  else if (dir === -1 && c.scrollLeft <= 0)         c.scrollTo({ left: max, behavior: "smooth" });
-  else    c.scrollBy({ left: dir * 300, behavior: "smooth" });
-};
-
-// ── MODAL DE IMAGEN ─────────────────────────────────────────
-window.openModal  = src => {
-  document.getElementById("modalImg").src = src;
-  document.getElementById("imageModal").classList.add("show");
-};
-window.closeModal = () => document.getElementById("imageModal")?.classList.remove("show");
-
 // ── SCROLL ANIMATIONS ────────────────────────────────────────
 export function initScrollAnimations() {
   const io = new IntersectionObserver(entries => {
@@ -50,7 +33,7 @@ export function initScrollAnimations() {
       if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); }
     });
   }, { threshold: 0.1 });
-  document.querySelectorAll(".fade-up, .gallery-item").forEach(el => io.observe(el));
+  document.querySelectorAll(".fade-up").forEach(el => io.observe(el));
 }
 
 // ── BEFORE / AFTER SLIDER ───────────────────────────────────

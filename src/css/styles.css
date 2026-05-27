@@ -30,7 +30,7 @@
   /* Tipografías */
   --font-serif:  'Cormorant Garamond', Georgia, serif;
   --font-sans:   'Jost', sans-serif;
-  --font-family: 'Lobster Two', cursive;
+  --nav-bg:      #feb3b3;
   /* Radios */
   --radius:      4px;
   --radius-md:   8px;
@@ -89,7 +89,7 @@ button { font-family: var(--font-sans); }
   top: 0; left: 0; right: 0;
   z-index: 100;
   height: var(--nav-h);
-  background: #feb3b3;
+  background: var(--nav-bg);
   border-bottom: 1px solid var(--beige-dark);
   padding: 0 5%;
   display: grid;
@@ -101,7 +101,7 @@ button { font-family: var(--font-sans); }
 #navbar > .nav-logo  { justify-self: start; }
 #navbar > .nav-links { justify-self: center; }
 #navbar.scrolled {
-  background: #feb3b3;
+  background: var(--nav-bg);
   box-shadow: var(--shadow-sm);
 }
 
@@ -179,11 +179,7 @@ button { font-family: var(--font-sans); }
   margin: 8px 0;
 }
 
-/* ── UPDATE TOAST (oculto temporalmente — descomentar cuando esté listo) ── */
-/* TODO: quitar esta línea para activar el toast de actualizaciones */
-.update-toast { display: none !important; }
-
-/* ── UPDATE TOAST base styles ── */
+/* ── UPDATE TOAST ── */
 .update-toast {
   position: fixed;
   bottom: -140px; /* off-screen por defecto */
@@ -887,79 +883,6 @@ section { padding: 100px 5%; }
 
 
 /* ════════════════════════════════════════
-   GALLERY SCROLL (opcional)
-════════════════════════════════════════ */
-.gallery-container { position: relative; }
-.gallery-scroll {
-  display: flex;
-  overflow-x: auto;
-  gap: 16px;
-  scroll-behavior: smooth;
-  padding: 20px 4px;
-  scrollbar-width: none;
-}
-.gallery-scroll::-webkit-scrollbar { display: none; }
-.gallery-item {
-  min-width: 250px;
-  height: 250px;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.3s;
-  cursor: pointer;
-}
-.gallery-item:hover { transform: scale(1.04); z-index: 2; }
-.gallery-item img { width: 100%; height: 100%; object-fit: cover; }
-
-.scroll-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.45);
-  color: var(--white);
-  border: none;
-  font-size: 24px;
-  width: 40px; height: 60px;
-  cursor: pointer;
-  z-index: 10;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-.scroll-btn:hover { background: rgba(0, 0, 0, 0.65); }
-.scroll-btn.left  { left: 0; }
-.scroll-btn.right { right: 0; }
-
-.image-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.82);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-  cursor: zoom-out;
-}
-.image-modal.show { display: flex; }
-.image-modal img {
-  max-width: 90%; max-height: 90%;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-}
-.close-btn {
-  position: absolute;
-  top: 20px; right: 30px;
-  font-size: 40px;
-  color: var(--white);
-  cursor: pointer;
-  line-height: 1;
-  opacity: 0.75;
-  transition: opacity 0.2s;
-}
-.close-btn:hover { opacity: 1; }
-
-
-/* ════════════════════════════════════════
    FORMS (compartidos: contact + login + admin)
 ════════════════════════════════════════ */
 .form-group { margin-bottom: 20px; }
@@ -1295,59 +1218,6 @@ section { padding: 100px 5%; }
 
 
 /* ════════════════════════════════════════
-   CHATBOT FAB
-════════════════════════════════════════ */
-.chatbot-fab {
-  position: fixed;
-  bottom: 28px; right: 28px;
-  width: 58px; height: 58px;
-  background: var(--rose);
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 6px 24px rgba(237, 104, 135, 0.42);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 150;
-  transition: var(--transition);
-  animation: fabPulse 2.8s ease-in-out infinite;
-  color: var(--white);
-}
-.chatbot-fab:hover {
-  background: var(--rose-dark);
-  transform: scale(1.08);
-  animation: none;
-}
-
-@keyframes fabPulse {
-  0%, 100% { box-shadow: 0 6px 24px rgba(237, 104, 135, 0.4); }
-  50%      { box-shadow: 0 6px 40px rgba(237, 104, 135, 0.65); }
-}
-
-.chatbot-bubble {
-  position: fixed;
-  bottom: 100px; right: 28px;
-  background: var(--white);
-  border-radius: 16px 16px 4px 16px;
-  padding: 14px 18px;
-  font-size: 13px;
-  color: var(--text-mid);
-  box-shadow: var(--shadow-md);
-  max-width: 220px;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: all 0.3s;
-  pointer-events: none;
-  z-index: 149;
-  line-height: 1.6;
-  border: 1px solid var(--beige-dark);
-}
-.chatbot-bubble.show { opacity: 1; transform: translateY(0); }
-.chatbot-bubble strong { color: var(--rose); }
-
-
-/* ════════════════════════════════════════
    FOOTER
 ════════════════════════════════════════ */
 footer {
@@ -1390,7 +1260,23 @@ footer {
   font-size: 11px;
   letter-spacing: 1px;
   color: rgba(255, 255, 255, 0.25);
+  margin-top: 4px;
 }
+
+.footer-admin-link {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.15);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 12px;
+  transition: color 0.2s;
+}
+.footer-admin-link:hover { color: rgba(255, 255, 255, 0.45); }
 
 
 /* ════════════════════════════════════════
@@ -2000,9 +1886,6 @@ body.page-admin {
 
   footer { flex-direction: column; text-align: center; }
   .footer-links { justify-content: center; }
-
-  .chatbot-fab    { bottom: 20px; right: 20px; }
-  .chatbot-bubble { right: 20px; bottom: 90px; }
 
   /* LOGIN responsive */
   body.page-login { grid-template-columns: 1fr; }
@@ -2999,31 +2882,6 @@ body.page-client {
   z-index: 299;
 }
 .mobile-nav-overlay.open { display: block; }
-
-/* ══ Admin corner button ══════════════════════════════════ */
-.admin-corner-btn {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.85);
-  border: 1px solid #e0d6cf;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.10);
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  transition: box-shadow 0.2s, background 0.2s;
-  backdrop-filter: blur(4px);
-}
-.admin-corner-btn:hover {
-  background: #fff;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-}
 
 /* ══ Login Modal ══════════════════════════════════════════ */
 #loginModal {

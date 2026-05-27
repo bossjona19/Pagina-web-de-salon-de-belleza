@@ -105,7 +105,7 @@
   </div>
   <div class="hero-stats" role="list" aria-label="Estadísticas del estudio">
     <div class="stat" role="listitem"><div class="stat-num">500+</div><div class="stat-label">Clientas felices</div></div>
-    <div class="stat" role="listitem"><div class="stat-num">15</div><div class="stat-label">Años de experiencia</div></div>
+    <div class="stat" role="listitem"><div class="stat-num">8+</div><div class="stat-label">Años de experiencia</div></div>
     <div class="stat" role="listitem"><div class="stat-num">100%</div><div class="stat-label">Productos premium</div></div>
   </div>
 </section>
@@ -271,7 +271,8 @@
     <a href="#galeria">Galería</a>
     <a href="#contacto">Contacto</a>
   </nav>
-  <p class="footer-copy" style="margin-top:4px;font-size:11px;color:#ccc;">© 2025 Eternal Beauty Studio · Panamá</p>
+  <p class="footer-copy">© 2025 Eternal Beauty Studio · Panamá</p>
+  <button class="footer-admin-link" onclick="document.getElementById('loginModal').classList.add('open')">Admin</button>
 </footer>
 
 <!-- ════════ LOGIN MODAL ════════ -->
@@ -342,27 +343,8 @@
   </div>
 </div>
 
-<!-- ════════ IMAGE MODAL ════════ -->
-<div class="image-modal" id="imageModal" onclick="closeModal()" role="dialog" aria-label="Imagen ampliada">
-  <span class="close-btn" aria-label="Cerrar">&times;</span>
-  <img id="modalImg" alt="Imagen ampliada">
-</div>
 
 
-
-<!-- ════════ ADMIN CORNER ════════ -->
-<button class="admin-corner-btn" onclick="document.getElementById('loginModal').classList.add('open')" aria-label="Acceso admin">
-  🔐
-</button>
-
-<!-- ════════ CHATBOT FAB ════════ -->
-<button class="chatbot-fab" id="chatbotFab" aria-label="Abrir asistente virtual" onclick="toggleChatbot()">
-  <i data-lucide="bot" class="icon-lg"></i>
-</button>
-<div class="chatbot-bubble" id="chatbotBubble">
-  ¡Hola! 👋 Soy tu asistente.<br>
-  <strong>¿En qué puedo ayudarte hoy?</strong>
-</div>
 
 <!-- ════════ UPDATE TOAST ════════ -->
 <div id="updateToast" class="update-toast" role="status" aria-live="polite" aria-atomic="true">
@@ -384,27 +366,6 @@
 <script src="./src/js/sw-register.js" defer></script>
 <script type="module" src="./src/js/app.js"></script>
 
-<!-- Lucide + Chatbot (no necesitan Firebase, van normales) -->
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  if (window.lucide) lucide.createIcons();
-});
-
-let bubbleTimer;
-function toggleChatbot() {
-  const bubble = document.getElementById("chatbotBubble");
-  bubble.classList.toggle("show");
-  clearTimeout(bubbleTimer);
-  if (bubble.classList.contains("show")) {
-    bubbleTimer = setTimeout(() => bubble.classList.remove("show"), 4000);
-  }
-}
-setTimeout(() => {
-  const b = document.getElementById("chatbotBubble");
-  b.classList.add("show");
-  bubbleTimer = setTimeout(() => b.classList.remove("show"), 5000);
-}, 3000);
-</script>
 
 </body>
 </html>

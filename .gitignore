@@ -3,3 +3,5 @@ package-lock.json
 setup-admins.js
 .claude
 aaa
+.agents
+skills-lock.json
