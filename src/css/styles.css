@@ -209,111 +209,148 @@ button { font-family: var(--font-sans); }
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.38);
   z-index: 9000;
   align-items: flex-end;
   justify-content: center;
-  padding: 0;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
-.ios-install-overlay.open { display: flex; }
+.ios-install-overlay.open {
+  display: flex;
+  animation: iosOverlayIn 0.22s ease;
+}
+@keyframes iosOverlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 
 .ios-install-card {
   background: #fff;
-  border-radius: 24px 24px 0 0;
-  padding: 36px 28px 48px;
+  border-radius: 20px 20px 0 0;
+  padding: 10px 22px max(28px, env(safe-area-inset-bottom, 28px));
   width: 100%;
-  max-width: 520px;
-  position: relative;
-  text-align: center;
-  animation: iosSlideUp 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  max-width: 480px;
+  animation: iosSlideUp 0.42s cubic-bezier(0.32, 0.72, 0, 1);
 }
 @keyframes iosSlideUp {
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
 
-.ios-install-close {
-  position: absolute;
-  top: 16px; right: 20px;
-  background: #f0f0f0;
-  border: none;
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  font-size: 14px;
-  color: #666;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.2s;
-}
-.ios-install-close:hover { background: #e0e0e0; }
-
-.ios-install-appicon {
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-  margin-bottom: 14px;
+/* Drag handle */
+.ios-handle {
+  width: 36px;
+  height: 4px;
+  background: #d8d8d8;
+  border-radius: 2px;
+  margin: 0 auto 20px;
 }
 
-.ios-install-title {
-  font-family: var(--font-serif);
-  font-size: 22px;
-  font-weight: 500;
-  color: var(--text-dark);
-  margin: 0 0 8px;
-}
-
-.ios-install-desc {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  color: var(--text-mid);
-  line-height: 1.5;
-  margin: 0 0 28px;
-}
-
-.ios-install-steps {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 24px;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.ios-install-steps li {
+/* App row */
+.ios-app-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
+  margin-bottom: 16px;
 }
-.ios-step-icon {
+.ios-app-icon {
+  border-radius: 14px;
   flex-shrink: 0;
-  width: 44px; height: 44px;
-  border-radius: 12px;
-  background: var(--beige);
-  border: 1px solid var(--beige-dark);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--rose);
 }
-.ios-install-steps p {
+.ios-app-info { flex: 1; min-width: 0; }
+.ios-app-name {
   font-family: var(--font-sans);
-  font-size: 14px;
-  color: var(--text-dark);
-  line-height: 1.45;
-  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #111;
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.ios-install-steps strong { color: var(--text-dark); }
-
-.ios-install-arrow {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  color: var(--rose);
+.ios-app-sub {
   font-family: var(--font-sans);
   font-size: 12px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  opacity: 0.75;
+  color: #888;
+  margin: 0;
+}
+
+/* Close × */
+.ios-close-btn {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: #ebebeb;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  color: #555;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ios-close-btn:hover { background: #ddd; }
+
+/* Separator */
+.ios-sep {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.07);
+  margin: 0 0 16px;
+}
+
+/* Steps */
+.ios-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.ios-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ios-n {
+  flex-shrink: 0;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--rose);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.ios-step-text {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  color: #222;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.ios-step-text i {
+  font-style: normal;
+  color: var(--rose);
+}
+.ios-share-icon {
+  color: var(--rose);
+  vertical-align: -1px;
+  flex-shrink: 0;
+}
+
+/* Bottom hint */
+.ios-hint {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: #bbb;
+  text-align: center;
+  margin: 0;
+  letter-spacing: 0.2px;
 }
 
 /* ── UPDATE TOAST (oculto temporalmente — descomentar cuando esté listo) ── */
