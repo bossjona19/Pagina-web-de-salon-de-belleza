@@ -176,28 +176,36 @@ button { font-family: var(--font-sans); }
   .install-btn { display: none !important; } /* En móvil va en el menú */
 }
 
-/* ── INSTALL BUTTON (móvil — icono circular junto al hamburger) ── */
+/* ── INSTALL BUTTON (móvil — esquina inferior derecha, sobre el botón admin) ── */
 .mobile-install-btn {
-  display: none; /* oculto hasta que beforeinstallprompt dispare */
-  width: 36px;
-  height: 36px;
+  /* Posición fija: apilado sobre .admin-corner-btn (bottom: 90px + 40px + 8px) */
+  position: fixed;
+  bottom: 138px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  /* Mismo lenguaje visual que admin-corner-btn: glass, sutil */
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(237, 104, 135, 0.22);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.09);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: none; /* oculto hasta que el browser lo permita */
   align-items: center;
   justify-content: center;
-  background: var(--rose);
-  color: var(--white);
-  border: none;
-  border-radius: 50%;
+  color: var(--rose);
   cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.3s ease, transform 0.2s ease;
+  z-index: 120;
+  transition: background 0.2s, box-shadow 0.2s;
 }
 .mobile-install-btn.visible {
   display: flex;
 }
 .mobile-install-btn:hover,
 .mobile-install-btn:active {
-  background: var(--rose-dark);
-  transform: scale(1.1);
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(237, 104, 135, 0.18);
 }
 
 @media (min-width: 769px) {
