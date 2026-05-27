@@ -82,8 +82,17 @@
   <a href="#servicios" onclick="closeMobileNav()">Servicios</a>
   <a href="#galeria"   onclick="closeMobileNav()">Galería</a>
   <a href="#contacto"  onclick="closeMobileNav()">Contacto</a>
+  <div class="mobile-nav-sep" aria-hidden="true"></div>
   <button class="mobile-admin-link" onclick="closeMobileNav(); document.getElementById('loginModal').classList.add('open')">
     🔐 Admin
+  </button>
+  <button id="installBtnMobile" class="mobile-install-btn" aria-label="Instalar app" onclick="closeMobileNav()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    Instalar app
   </button>
 </div>
 <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
@@ -350,14 +359,14 @@
 <!-- ════════ iOS INSTALL MODAL ════════ -->
 <div id="iosInstallModal" class="ios-install-overlay" role="dialog" aria-modal="true" aria-labelledby="iosInstallTitle">
   <div class="ios-install-card">
-
     <div class="ios-handle" aria-hidden="true"></div>
-
     <div class="ios-app-row">
-      <img class="ios-app-icon" src="/favicon/web-app-manifest-192x192.png" alt="Eternal Beauty Studio" width="52" height="52">
+      <img class="ios-app-icon" src="/favicon/web-app-manifest-192x192.png" alt="Eternal Beauty Studio" width="44" height="44">
       <div class="ios-app-info">
         <p class="ios-app-name" id="iosInstallTitle">Eternal Beauty Studio</p>
-        <p class="ios-app-sub">Añadir a pantalla de inicio</p>
+        <p class="ios-app-crumb">
+          Compartir&nbsp;<svg class="ios-share-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>&nbsp;›&nbsp;Añadir a pantalla de inicio
+        </p>
       </div>
       <button id="iosInstallClose" class="ios-close-btn" aria-label="Cerrar">
         <svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
@@ -365,37 +374,9 @@
         </svg>
       </button>
     </div>
-
-    <div class="ios-sep" aria-hidden="true"></div>
-
-    <ol class="ios-steps">
-      <li>
-        <span class="ios-n" aria-hidden="true">1</span>
-        <span class="ios-step-text">Pulsa&nbsp;<svg class="ios-share-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>&nbsp;en la barra de Safari</span>
-      </li>
-      <li>
-        <span class="ios-n" aria-hidden="true">2</span>
-        <span class="ios-step-text">Toca <i>"Añadir a pantalla de inicio"</i></span>
-      </li>
-      <li>
-        <span class="ios-n" aria-hidden="true">3</span>
-        <span class="ios-step-text">Confirma con <i>"Añadir"</i></span>
-      </li>
-    </ol>
-
-    <p class="ios-hint" aria-hidden="true">↓ Barra de herramientas de Safari</p>
-
+    <p class="ios-hint" aria-hidden="true">↓ Safari · barra inferior</p>
   </div>
 </div>
-
-<!-- Instalar PWA (móvil) — fixed, esquina inferior derecha, sobre el botón admin -->
-<button id="installBtnMobile" class="mobile-install-btn" aria-label="Instalar app">
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-    <polyline points="7 10 12 15 17 10"/>
-    <line x1="12" y1="15" x2="12" y2="3"/>
-  </svg>
-</button>
 
 <!-- ════════ ADMIN CORNER ════════ -->
 <button class="admin-corner-btn" onclick="document.getElementById('loginModal').classList.add('open')" aria-label="Acceso admin">
