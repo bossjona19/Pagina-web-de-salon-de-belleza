@@ -245,19 +245,16 @@ function _initAndroidInstall() {
 
 // ── FLUJO iOS / SAFARI ───────────────────────────────────────
 function _initIOSInstall() {
-  console.log("[PWA] iOS Safari detectado — mostrando guía de instalación");
+  console.log("[PWA] iOS Safari detectado — mostrando botón de instalación");
   _showInstallBtns();
 
-  const modal = document.getElementById("iosInstallModal");
-  if (!modal) return;
+  function showHint() {
+    const toast = document.getElementById("iosHint");
+    if (!toast) return;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3500);
+  }
 
-  function openModal()  { modal.classList.add("open");    }
-  function closeModal() { modal.classList.remove("open"); }
-
-  document.getElementById("installBtn")?.addEventListener("click", openModal);
-  document.getElementById("installBtnMobile")?.addEventListener("click", openModal);
-  document.getElementById("iosInstallClose")?.addEventListener("click", closeModal);
-
-  modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+  document.getElementById("installBtn")?.addEventListener("click", showHint);
+  document.getElementById("installBtnMobile")?.addEventListener("click", showHint);
 }

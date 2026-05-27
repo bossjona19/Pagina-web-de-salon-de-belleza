@@ -356,24 +356,9 @@
   <img id="modalImg" alt="Imagen ampliada">
 </div>
 
-<!-- ════════ iOS INSTALL MODAL ════════ -->
-<div id="iosInstallModal" class="ios-install-overlay" role="dialog" aria-modal="true" aria-labelledby="iosInstallTitle">
-  <div class="ios-install-card">
-    <div class="ios-handle" aria-hidden="true"></div>
-    <div class="ios-app-row">
-      <img class="ios-app-icon" src="/favicon/web-app-manifest-192x192.png" alt="Eternal Beauty Studio" width="44" height="44">
-      <div class="ios-app-info">
-        <p class="ios-app-name" id="iosInstallTitle">Eternal Beauty Studio</p>
-        <p class="ios-app-crumb">Compartir&nbsp;<svg class="ios-share-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>&nbsp;→ Añadir a pantalla</p>
-      </div>
-      <button id="iosInstallClose" class="ios-close-btn" aria-label="Cerrar">
-        <svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
-          <line x1="1" y1="1" x2="8" y2="8"/><line x1="8" y1="1" x2="1" y2="8"/>
-        </svg>
-      </button>
-    </div>
-    <p class="ios-hint" aria-hidden="true">↓ Safari · barra inferior</p>
-  </div>
+<!-- iOS hint — mini toast, auto-dismiss -->
+<div id="iosHint" class="ios-hint-toast" role="status" aria-live="polite">
+  Compartir ↑ · Añadir a pantalla de inicio
 </div>
 
 <!-- ════════ ADMIN CORNER ════════ -->
