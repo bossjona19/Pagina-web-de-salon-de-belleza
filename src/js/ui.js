@@ -162,64 +162,102 @@ export function initLoginModal() {
 
 // ── BOTÓN INSTALAR PWA ───────────────────────────────────────
 export function initInstallButton() {
+  // Ya está instalada como app — no hacer nada
   if (
     window.matchMedia("(display-mode: standalone)").matches ||
     window.navigator.standalone === true
   ) return;
 
-  const desktopBtn = document.getElementById("installBtn");
-  const mobileBtn  = document.getElementById("installBtnMobile");
+  const ua = navigator.userAgent;
 
-  function show() {
-    desktopBtn?.classList.add("visible");
-    mobileBtn?.classList.add("visible");
+  // iOS: iPhone, iPad (incluyendo iPadOS 13+ que reporta MacIntel con touchpoints)
+  const isIOS = /iphone|ipad|ipod/i.test(ua) ||
+                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  // Safari puro: excluye Chrome iOS, Firefox iOS, Edge iOS
+  const isSafari = /safari/i.test(ua) && !/chrome|crios|fxios|edgios|gsa/i.test(ua);
+
+  if (isIOS && isSafari) {
+    _initIOSInstall();
+  } else {
+    _initAndroidInstall();
+  }
+}
+
+// ── Helpers compartidos ──────────────────────────────────────
+function _showInstallBtns() {
+  document.getElementById("installBtn")?.classList.add("visible");
+  document.getElementById("installBtnMobile")?.classList.add("visible");
+}
+function _hideInstallBtns() {
+  document.getElementById("installBtn")?.classList.remove("visible");
+  document.getElementById("installBtnMobile")?.classList.remove("visible");
+  window.__pwaInstallPrompt = null;
+}
+
+// ── FLUJO ANDROID / CHROME ───────────────────────────────────
+function _initAndroidInstall() {
+  // El evento puede haber llegado antes de DOMContentLoaded (script inline en <head>)
+  if (window.__pwaInstallPrompt) {
+    console.log("[PWA] beforeinstallprompt capturado temprano — mostrando botón");
+    _showInstallBtns();
   }
 
-  function hide() {
-    desktopBtn?.classList.remove("visible");
-    mobileBtn?.classList.remove("visible");
-    window.__pwaInstallPrompt = null;
-  }
-
-  // beforeinstallprompt puede haber llegado antes de DOMContentLoaded
-  // (capturado por el script inline del <head>)
-  if (window.__pwaInstallPrompt) show();
-
-  // También escuchar eventos futuros (visitas posteriores, tras update del SW)
   window.addEventListener("beforeinstallprompt", (e) => {
+    console.log("[PWA] beforeinstallprompt disparado en Android/Chrome");
     e.preventDefault();
     window.__pwaInstallPrompt = e;
-    show();
+    _showInstallBtns();
   });
 
-  window.addEventListener("appinstalled", hide);
+  window.addEventListener("appinstalled", () => {
+    console.log("[PWA] App instalada exitosamente");
+    _hideInstallBtns();
+  });
 
   async function triggerInstall() {
     const prompt = window.__pwaInstallPrompt;
     if (!prompt) return;
 
-    // Consumir inmediatamente para evitar doble clic
-    window.__pwaInstallPrompt = null;
-    if (desktopBtn) desktopBtn.disabled = true;
-    if (mobileBtn)  mobileBtn.disabled  = true;
+    window.__pwaInstallPrompt = null; // consumir antes de ir async
+
+    const db = document.getElementById("installBtn");
+    const mb = document.getElementById("installBtnMobile");
+    if (db) db.disabled = true;
+    if (mb) mb.disabled = true;
 
     try {
-      prompt.prompt(); // debe ser síncrono — dentro del gesto del usuario
+      prompt.prompt(); // DEBE ser síncrono dentro del gesto del usuario
       const { outcome } = await prompt.userChoice;
-      // El evento ya fue consumido: ocultar siempre tras la elección
-      hide();
+      console.log("[PWA] Elección del usuario:", outcome);
+      _hideInstallBtns();
     } catch (err) {
-      console.warn("PWA install:", err);
+      console.warn("[PWA] Error al instalar:", err);
     } finally {
-      if (desktopBtn) desktopBtn.disabled = false;
-      if (mobileBtn)  mobileBtn.disabled  = false;
+      if (db) db.disabled = false;
+      if (mb) mb.disabled = false;
     }
   }
 
-  desktopBtn?.addEventListener("click", triggerInstall);
+  document.getElementById("installBtn")?.addEventListener("click", triggerInstall);
+  document.getElementById("installBtnMobile")?.addEventListener("click", triggerInstall);
+}
 
-  mobileBtn?.addEventListener("click", () => {
-    window.closeMobileNav?.();
-    triggerInstall();
-  });
+// ── FLUJO iOS / SAFARI ───────────────────────────────────────
+function _initIOSInstall() {
+  console.log("[PWA] iOS Safari detectado — mostrando guía de instalación");
+  _showInstallBtns();
+
+  const modal = document.getElementById("iosInstallModal");
+  if (!modal) return;
+
+  function openModal()  { modal.classList.add("open");    }
+  function closeModal() { modal.classList.remove("open"); }
+
+  document.getElementById("installBtn")?.addEventListener("click", openModal);
+  document.getElementById("installBtnMobile")?.addEventListener("click", openModal);
+  document.getElementById("iosInstallClose")?.addEventListener("click", closeModal);
+
+  modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 }

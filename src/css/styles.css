@@ -204,6 +204,118 @@ button { font-family: var(--font-sans); }
   .mobile-install-btn { display: none !important; } /* en desktop usa .install-btn */
 }
 
+/* ── iOS INSTALL MODAL ──────────────────────────────────────── */
+.ios-install-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9000;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.ios-install-overlay.open { display: flex; }
+
+.ios-install-card {
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  padding: 36px 28px 48px;
+  width: 100%;
+  max-width: 520px;
+  position: relative;
+  text-align: center;
+  animation: iosSlideUp 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes iosSlideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.ios-install-close {
+  position: absolute;
+  top: 16px; right: 20px;
+  background: #f0f0f0;
+  border: none;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.ios-install-close:hover { background: #e0e0e0; }
+
+.ios-install-appicon {
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  margin-bottom: 14px;
+}
+
+.ios-install-title {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text-dark);
+  margin: 0 0 8px;
+}
+
+.ios-install-desc {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text-mid);
+  line-height: 1.5;
+  margin: 0 0 28px;
+}
+
+.ios-install-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.ios-install-steps li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ios-step-icon {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--beige);
+  border: 1px solid var(--beige-dark);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--rose);
+}
+.ios-install-steps p {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text-dark);
+  line-height: 1.45;
+  margin: 0;
+}
+.ios-install-steps strong { color: var(--text-dark); }
+
+.ios-install-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--rose);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
 /* ── UPDATE TOAST (oculto temporalmente — descomentar cuando esté listo) ── */
 /* TODO: quitar esta línea para activar el toast de actualizaciones */
 .update-toast { display: none !important; }
