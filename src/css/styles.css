@@ -177,7 +177,7 @@ button { font-family: var(--font-sans); }
 }
 
 /* ── INSTALL BUTTON (móvil — ítem discreto dentro del menú) ── */
-.mobile-install-btn {
+.mobile-install-link {
   display: none; /* oculto hasta que el browser lo permita */
   width: 100%;
   padding: 11px 0;
@@ -195,11 +195,11 @@ button { font-family: var(--font-sans); }
   gap: 8px;
   transition: opacity 0.2s;
 }
-.mobile-install-btn.visible { display: flex; }
-.mobile-install-btn:hover   { opacity: 1; }
+.mobile-install-link.visible { display: flex; }
+.mobile-install-link:hover   { opacity: 1; }
 
 @media (min-width: 769px) {
-  .mobile-install-btn { display: none !important; }
+  .mobile-install-link { display: none !important; }
 }
 
 /* Separador dentro del menú móvil */
