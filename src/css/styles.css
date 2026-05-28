@@ -31,6 +31,7 @@
   --font-serif:  'Cormorant Garamond', Georgia, serif;
   --font-sans:   'Jost', sans-serif;
   --nav-bg:      #feb3b3;
+  --wa-green:    #25D366;
   /* Radios */
   --radius:      4px;
   --radius-md:   8px;
@@ -253,25 +254,6 @@ button { font-family: var(--font-sans); }
   .update-toast-btn  { width: 100%; text-align: center; }
 }
 
-.nav-cta {
-  background: var(--rose);
-  color: var(--white);
-  border: none;
-  padding: 14px 30px;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: var(--radius);
-  transition: var(--transition);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.nav-cta:hover { background: var(--rose-dark); transform: translateY(-1px); }
-
-
 /* ════════════════════════════════════════
    HERO
 ════════════════════════════════════════ */
@@ -286,23 +268,6 @@ button { font-family: var(--font-sans); }
   padding: calc(var(--nav-h) + 60px) 5% 80px;
   position: relative;
   overflow: hidden;
-}
-
-.hero-deco {
-  position: absolute;
-  border-radius: 50%;
-  opacity: 0.18;
-  pointer-events: none;
-}
-.hero-deco-1 {
-  width: 520px; height: 520px;
-  background: var(--rose);
-  top: -120px; right: -120px;
-}
-.hero-deco-2 {
-  width: 320px; height: 320px;
-  background: var(--gold);
-  bottom: -60px; left: -100px;
 }
 
 .hero-eyebrow {
@@ -452,7 +417,7 @@ section { padding: 100px 5%; }
 }
 
 .btn-whatsapp {
-  background: #25D366;
+  background: var(--wa-green);
   color: var(--white);
   border: none;
   padding: 14px 22px;
@@ -1189,7 +1154,7 @@ section { padding: 100px 5%; }
 }
 
 .btn-wa {
-  background: #25D366;
+  background: var(--wa-green);
   color: var(--white);
   border: none;
   padding: 15px 18px;
@@ -1221,7 +1186,7 @@ section { padding: 100px 5%; }
    FOOTER
 ════════════════════════════════════════ */
 footer {
-  background: #2e2a2a;
+  background: var(--sidebar-bg);
   color: rgba(255, 255, 255, 0.45);
   padding: 48px 5%;
   display: flex;
@@ -1788,7 +1753,7 @@ body.page-admin {
 .btn-cancel        { background: rgba(237, 104, 135, 0.12); color: var(--rose-dark); }
 .btn-cancel:hover  { background: var(--rose); color: white; }
 .btn-action.btn-wa { background: rgba(37, 211, 102, 0.12); color: #128C7E; padding: 6px 10px; }
-.btn-action.btn-wa:hover { background: #25D366; color: white; }
+.btn-action.btn-wa:hover { background: var(--wa-green); color: white; }
 
 .empty-state {
   text-align: center;
@@ -1818,8 +1783,8 @@ body.page-admin {
 .toast {
   position: fixed;
   bottom: 24px; right: 24px;
-  background: #2e2a2a;
-  color: white;
+  background: var(--sidebar-bg);
+  color: var(--white);
   padding: 14px 24px;
   border-radius: 8px;
   font-size: 13px;
@@ -2639,7 +2604,7 @@ body.page-client {
   position: fixed;
   bottom: 24px; left: 50%;
   transform: translateX(-50%) translateY(80px);
-  background: #2e2a2a;
+  background: var(--sidebar-bg);
   color: var(--white);
   padding: 12px 28px;
   border-radius: var(--radius-full);
