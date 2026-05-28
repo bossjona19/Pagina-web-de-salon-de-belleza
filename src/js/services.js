@@ -1,4 +1,8 @@
 // services.js — Datos de servicios, filtros y grid de tarjetas
+//
+// IMÁGENES PENDIENTES: reemplazar cada `img` con ruta local /src/assets/img/services/<nombre>.jpg
+// Tamaño recomendado: 600×400 px, formato WebP, < 80 KB por imagen.
+// Mientras tanto, los errores de carga se manejan con opacidad 0 (fondo beige visible).
 
 export const SERVICES = [
   { id: 1, name: "Corte completo",      category: "corte",
@@ -113,14 +117,21 @@ export function renderServices() {
     card.addEventListener("click", () => openDetail(+card.dataset.id))
   );
 
+  grid.querySelectorAll(".card-img").forEach(img =>
+    img.addEventListener("error", () => { img.style.opacity = "0"; }, { once: true })
+  );
+
   populateSelect();
 }
 
 function openDetail(id) {
   const s = SERVICES.find(x => x.id === id);
   if (!s) return;
-  document.getElementById("detailImg").src           = s.img;
-  document.getElementById("detailImg").alt           = s.name;
+  const detailImg = document.getElementById("detailImg");
+  detailImg.style.opacity = "1";
+  detailImg.onerror = () => { detailImg.style.opacity = "0"; };
+  detailImg.src = s.img;
+  detailImg.alt = s.name;
   document.getElementById("detailTag").textContent   = `${s.category} · ${s.duration}`;
   document.getElementById("detailName").textContent  = s.name;
   document.getElementById("detailDesc").textContent  = s.description;
