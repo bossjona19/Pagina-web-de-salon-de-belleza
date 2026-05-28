@@ -1268,6 +1268,7 @@ footer {
 .footer-admin-link {
   background: none;
   border: none;
+  outline: none;
   font: inherit;
   color: inherit;
   letter-spacing: inherit;
