@@ -132,12 +132,23 @@ window.handleAdminLogin = async function () {
 export function initLoginModal() {
   const loginModal = document.getElementById("loginModal");
   if (!loginModal) return;
-  loginModal.addEventListener("click", e => {
-    if (e.target === loginModal) loginModal.classList.remove("open");
-  });
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") loginModal.classList.remove("open");
-  });
+
+  const openModal  = () => loginModal.classList.add("open");
+  const closeModal = () => loginModal.classList.remove("open");
+
+  // Open triggers
+  document.querySelectorAll(".footer-admin-link, .mobile-admin-link").forEach(btn =>
+    btn.addEventListener("click", () => {
+      if (btn.classList.contains("mobile-admin-link")) window.closeMobileNav?.();
+      openModal();
+    })
+  );
+
+  // Close triggers
+  loginModal.querySelector(".login-close-btn")?.addEventListener("click", closeModal);
+  loginModal.addEventListener("click", e => { if (e.target === loginModal) closeModal(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
   document.getElementById("loginPassword")?.addEventListener("keydown", e => {
     if (e.key === "Enter") window.handleAdminLogin();
   });

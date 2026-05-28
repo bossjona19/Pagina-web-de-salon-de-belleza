@@ -201,7 +201,7 @@ export async function submitForm() {
 
   const ok = document.getElementById("successMsg");
   if (ok) {
-    ok.innerHTML = `✅ ¡Solicitud enviada!&nbsp;&nbsp;<a href="${waUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;padding:7px 15px;border-radius:100px;text-decoration:none;font-size:13px;font-weight:600;vertical-align:middle;">💬 Confirmar por WhatsApp</a>`;
+    ok.innerHTML = `✅ ¡Solicitud enviada!&nbsp;&nbsp;<a href="${waUrl}" target="_blank" rel="noopener" class="btn-wa-link">💬 Confirmar por WhatsApp</a>`;
     ok.removeAttribute("style");
     ok.classList.add("show");
     setTimeout(() => {

@@ -33,5 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
   initLoginModal();
   initInstallButton();
 
+  document.getElementById("heroBtnServicios")?.addEventListener("click", () =>
+    document.querySelector("#servicios").scrollIntoView({ behavior: "smooth" })
+  );
+  document.getElementById("heroBtnContacto")?.addEventListener("click", () =>
+    document.querySelector("#contacto").scrollIntoView({ behavior: "smooth" })
+  );
+
   if (window.lucide) lucide.createIcons();
 });

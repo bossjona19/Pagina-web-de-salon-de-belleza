@@ -83,7 +83,7 @@
   <a href="#galeria"   onclick="closeMobileNav()">Galería</a>
   <a href="#contacto"  onclick="closeMobileNav()">Contacto</a>
   <div class="mobile-nav-sep" aria-hidden="true"></div>
-  <button class="mobile-admin-link" onclick="closeMobileNav(); document.getElementById('loginModal').classList.add('open')">
+  <button class="mobile-admin-link">
     🔐 Admin
   </button>
 </div>
@@ -100,8 +100,8 @@
     para que salgas sintiéndote increíble. Agenda tu cita hoy.
   </p>
   <div class="hero-buttons">
-    <button class="btn-primary" onclick="location.href='#servicios'">Ver servicios</button>
-    <button class="btn-outline" onclick="location.href='#contacto'">Reservar cita</button>
+    <button id="heroBtnServicios" class="btn-primary">Ver servicios</button>
+    <button id="heroBtnContacto" class="btn-outline">Reservar cita</button>
   </div>
   <div class="hero-stats" role="list" aria-label="Características del estudio">
     <div class="stat" role="listitem"><span class="stat-dot" aria-hidden="true">✦</span><span class="stat-label">Cita previa garantizada</span></div>
@@ -272,14 +272,14 @@
     <a href="#contacto">Contacto</a>
   </nav>
   <p class="footer-copy">© 2025 Eternal Beauty Studio · Panamá</p>
-  <button class="footer-admin-link" onclick="document.getElementById('loginModal').classList.add('open')">Admin</button>
+  <button class="footer-admin-link">Admin</button>
 </footer>
 
 <!-- ════════ LOGIN MODAL ════════ -->
 <div class="detail-overlay" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
   <div class="login-modal-box">
 
-    <button class="login-close-btn" onclick="document.getElementById('loginModal').classList.remove('open')" aria-label="Cerrar">✕</button>
+    <button class="login-close-btn" aria-label="Cerrar">✕</button>
 
     <!-- Logo -->
     <div class="login-logo" id="loginTitle">Eternal<em>Beauty</em></div>
