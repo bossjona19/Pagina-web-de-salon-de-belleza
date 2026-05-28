@@ -1243,12 +1243,12 @@ section { padding: 100px 5%; }
 footer {
   background: var(--sidebar-bg);
   color: rgba(255, 255, 255, 0.45);
-  padding: 48px 5%;
+  padding: 10px 1%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 24px;
+  gap: 12px;
+  text-align: center;
 }
 .footer-logo {
   font-family: var(--font-serif);
@@ -1259,44 +1259,27 @@ footer {
 }
 .footer-logo span { color: var(--rose-light); font-style: italic; }
 
-.footer-links {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-  list-style: none;
-}
-.footer-links a {
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.25s;
-}
-.footer-links a:hover { color: var(--rose-light); }
-
 .footer-copy {
   font-size: 11px;
   letter-spacing: 1px;
   color: rgba(255, 255, 255, 0.25);
-  margin-top: 4px;
 }
 
 .footer-admin-link {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.15);
-  font-family: var(--font-sans);
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
   cursor: pointer;
   padding: 0;
-  margin-top: 12px;
-  transition: color 0.2s;
+  opacity: 0.5;
+  transition: opacity 0.25s, color 0.25s;
 }
-.footer-admin-link:hover { color: rgba(255, 255, 255, 0.45); }
+.footer-admin-link:hover {
+  opacity: 1;
+  color: rgba(255, 255, 255, 0.6);
+}
 
 
 /* ════════════════════════════════════════
@@ -1365,9 +1348,6 @@ footer {
   .detail-actions   { width: 100%; }
   .detail-actions .btn-primary,
   .detail-actions .btn-whatsapp { flex: 1; justify-content: center; }
-
-  footer { flex-direction: column; text-align: center; }
-  .footer-links { justify-content: center; }
 
 }
 
