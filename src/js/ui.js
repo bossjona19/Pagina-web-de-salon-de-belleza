@@ -133,11 +133,20 @@ export function initLoginModal() {
   const loginModal = document.getElementById("loginModal");
   if (!loginModal) return;
 
-  const openModal  = () => loginModal.classList.add("open");
+  console.log("initLoginModal ejecutado");
+
+  const openModal = () => {
+    console.log("openModal ejecutado");
+    loginModal.classList.add("open");
+    console.log(loginModal.className);
+  };
   const closeModal = () => loginModal.classList.remove("open");
 
   // Open triggers
-  document.getElementById("footerAdminBtn")?.addEventListener("click", openModal);
+  document.getElementById("footerAdminBtn")?.addEventListener("click", () => {
+    console.log("click admin");
+    openModal();
+  });
   document.querySelectorAll(".mobile-admin-link").forEach(btn =>
     btn.addEventListener("click", () => { window.closeMobileNav?.(); openModal(); })
   );
