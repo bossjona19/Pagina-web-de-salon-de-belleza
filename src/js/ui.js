@@ -136,7 +136,6 @@ export function initLoginModal() {
   const openModal  = () => loginModal.classList.add("open");
   const closeModal = () => loginModal.classList.remove("open");
 
-  document.getElementById("footerAdminBtn")?.addEventListener("click", openModal);
   document.querySelectorAll(".mobile-admin-link").forEach(btn =>
     btn.addEventListener("click", () => { window.closeMobileNav?.(); openModal(); })
   );
