@@ -136,15 +136,15 @@ export function initLoginModal() {
   const openModal  = () => loginModal.classList.add("open");
   const closeModal = () => loginModal.classList.remove("open");
 
+  // Mobile nav admin link — necesita addEventListener porque el elemento es dinámico
   document.querySelectorAll(".mobile-admin-link").forEach(btn =>
     btn.addEventListener("click", () => { window.closeMobileNav?.(); openModal(); })
   );
 
-  // Close triggers
-  loginModal.querySelector(".login-close-btn")?.addEventListener("click", closeModal);
-  loginModal.addEventListener("click", e => { if (e.target === loginModal) closeModal(); });
-  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
-
+  // Escape key y Enter en password — no tienen elemento HTML propio
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeModal();
+  });
   document.getElementById("loginPassword")?.addEventListener("keydown", e => {
     if (e.key === "Enter") window.handleAdminLogin();
   });

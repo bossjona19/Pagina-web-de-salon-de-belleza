@@ -272,10 +272,12 @@
 </footer>
 
 <!-- ════════ LOGIN MODAL ════════ -->
-<div class="detail-overlay" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+<div class="detail-overlay" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle"
+  onclick="if(event.target===this)this.classList.remove('open')">
   <div class="login-modal-box">
 
-    <button class="login-close-btn" aria-label="Cerrar">✕</button>
+    <button class="login-close-btn" type="button" aria-label="Cerrar"
+      onclick="document.getElementById('loginModal').classList.remove('open')">✕</button>
 
     <!-- Logo -->
     <div class="login-logo" id="loginTitle">Eternal<em>Beauty</em></div>
