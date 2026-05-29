@@ -11,6 +11,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // Sesión anónima para que cualquier visitante pueda leer reservas de Firestore
   signInAnonymously(auth).catch(err => console.warn("Anon auth:", err.message));
 
+  // DEBUG — eliminar después de confirmar
+  console.assert(typeof flatpickr === "function",      "[TRACE] ✗ flatpickr no está en window");
+  console.assert(!!document.getElementById("loginModal"),     "[TRACE] ✗ loginModal no existe en DOM");
+  console.assert(!!document.getElementById("footerAdminBtn"), "[TRACE] ✗ footerAdminBtn no existe en DOM");
+  console.log("[TRACE] DOMContentLoaded alcanzado — montando listeners");
+
+  initLoginModal();
+  console.log("[TRACE] initLoginModal() ejecutado");
+
   renderFilters();
   renderServices();
   initScrollAnimations();
@@ -30,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initSlider("ba1", "afterWrap1", "baDivider1", "baHandle1");
   initSlider("ba2", "afterWrap2", "baDivider2", "baHandle2");
   initReservaListeners();
-  initLoginModal();
   initInstallButton();
 
   document.getElementById("heroBtnServicios")?.addEventListener("click", () =>
