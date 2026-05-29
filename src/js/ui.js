@@ -137,11 +137,9 @@ export function initLoginModal() {
   const closeModal = () => loginModal.classList.remove("open");
 
   // Open triggers
-  document.querySelectorAll(".footer-admin-link, .mobile-admin-link").forEach(btn =>
-    btn.addEventListener("click", () => {
-      if (btn.classList.contains("mobile-admin-link")) window.closeMobileNav?.();
-      openModal();
-    })
+  document.getElementById("footerAdminBtn")?.addEventListener("click", openModal);
+  document.querySelectorAll(".mobile-admin-link").forEach(btn =>
+    btn.addEventListener("click", () => { window.closeMobileNav?.(); openModal(); })
   );
 
   // Close triggers
